@@ -1,0 +1,3338 @@
+openapi: 3.0.0
+info:
+  title: casanet-local-server
+  description: IoT server for local home network - Server side
+  contact:
+    name: Haim Kastner
+    url: https://github.com/casanet/casanet-server
+    email: haim.kastner@gmail.com
+  license:
+    name: ISC
+  version: 2.0.0
+servers:
+- url: /API
+paths:
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      description: Login.
+      operationId: Login
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        "201":
+          description: 2-factors code sent
+        "204":
+          description: No content
+        "403":
+          description: Auth fail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Invalid schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+      x-swagger-router-controller: Authentication
+  /auth/login/tfa:
+    post:
+      tags:
+      - Authentication
+      description: 2-step verification login.
+      operationId: LoginTfa
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginMfa'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "403":
+          description: Auth fail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: Invalid schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+      x-swagger-router-controller: Authentication
+  /auth/logout:
+    post:
+      tags:
+      - Authentication
+      description: Logout manually from the system.
+      operationId: Logout
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Authentication
+  /auth/logout-sessions/{userId}:
+    post:
+      tags:
+      - Authentication
+      description: Logout from all activate sessions.
+      operationId: LogoutSessions
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Authentication
+  /backup:
+    get:
+      description: Get the current server data as a ZIP file
+      operationId: GetSettingsBackup
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Default
+  /devices:
+    get:
+      tags:
+      - Devices
+      description: Get all devices in the local network.
+      operationId: GetDevices
+      parameters: []
+      responses:
+        "200":
+          description: Local network devices array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalNetworkDevice'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Devices
+  /devices/kinds:
+    get:
+      tags:
+      - Devices
+      description: Get all supported devices kind info.
+      operationId: GetDevicesKinds
+      parameters: []
+      responses:
+        "200":
+          description: Local network devices array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceKind'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Devices
+  /devices/{deviceMac}:
+    put:
+      tags:
+      - Devices
+      description: Set name to a device.
+      operationId: SetDeviceName
+      parameters:
+      - name: deviceMac
+        in: path
+        description: Device mac address.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalNetworkDevice'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Devices
+  /devices/rescan:
+    post:
+      tags:
+      - Devices
+      description: "Rescan all devices in LAN.\r\nUsed when there are changes in the\
+        \ local network.\r\nFor example, if the router (DHCP server) change IP's of\
+        \ devices or new device connect to the local network etc."
+      operationId: RescanDevices
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Devices
+  /feed/minions:
+    get:
+      tags:
+      - Feeds
+      description: "Minions feed.\r\nwhen minion status changed minion created etc."
+      operationId: GetMinionsFeed
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MinionFeed'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Feeds
+  /feed/timings:
+    get:
+      tags:
+      - Feeds
+      description: "Timing feed.\r\nwhen timing activated."
+      operationId: GetTimingFeed
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimingFeed'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Feeds
+  /ifttt/settings:
+    get:
+      tags:
+      - Ifttt
+      description: Is IFTTT integration enabled.
+      operationId: IsIftttEnabled
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: boolean
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Ifttt
+    put:
+      tags:
+      - Ifttt
+      description: Put ifttt integration settings.
+      operationId: SetIftttIntegrationSettings
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IftttIntegrationSettings'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Ifttt
+  /ifttt/trigger/minions/raw:
+    post:
+      tags:
+      - Ifttt
+      description: "Ifttt webhooks triggering casa-net action API.\r\nwhen all details\
+        \ in body only, to allow send all data ion one text line.\r\nExample to use:\
+        \ SMS trigger has only simple text that can pass to IFTTT activity,\r\nand\
+        \ by current request, it is possible to control any minion by one single line\
+        \ of text.\r\nso fill the SMS text with JSON and by IFTTT set it to be the\
+        \ request body."
+      operationId: TriggeredSomeAction
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IftttRawActionTriggered'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - iftttAuth: []
+      x-swagger-router-controller: Ifttt
+  /ifttt/trigger/minions/{minionId}:
+    post:
+      tags:
+      - Ifttt
+      description: Ifttt webhooks triggering casa-net *minion* action API.
+      operationId: TriggeredMinionAction
+      parameters:
+      - name: minionId
+        in: path
+        description: minion to set status.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: status to set.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IftttActionTriggered'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - iftttAuth: []
+      x-swagger-router-controller: Ifttt
+  /ifttt/trigger/operations/{operationId}:
+    post:
+      tags:
+      - Ifttt
+      description: Ifttt webhooks triggering casa-net *operation* action API.
+      operationId: TriggeredOperationAction
+      parameters:
+      - name: operationId
+        in: path
+        description: operation to invoke.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Ifttt request auth and redirect data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IftttActionTriggeredRequest'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - iftttAuth: []
+      x-swagger-router-controller: Ifttt
+  /logs:
+    get:
+      description: Get the last logs of the local-server (download as text file)
+      operationId: GetLastLogs
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Default
+  /minions/timeline:
+    get:
+      tags:
+      - Minions
+      description: Get the timeline of minions status.
+      operationId: GetMinionsTimeline
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MinionTimeline'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/power-off:
+    put:
+      tags:
+      - Minions
+      description: Power off all minions
+      operationId: PowerAllOff
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/rename/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Update minion name.
+      operationId: RenameMinion
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionRename'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/room/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Update minion room name.
+      operationId: RenameRoom
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Minion room name to set.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionSetRoomName'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/timeout/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Update minion auto turns off timeout.
+      operationId: SetMinionTimeout
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Timeout property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetMinionAutoTurnOff'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/calibrate/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Update minion auto turns off timeout.
+      operationId: SetMinionCalibrate
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionCalibrate'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/rescan/{minionId}:
+    post:
+      tags:
+      - Minions
+      description: Recheck minion device status (update server status cache).
+      operationId: RescanMinionStatus
+      parameters:
+      - name: minionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/rescan:
+    get:
+      tags:
+      - Minions
+      description: Get the current scanning status
+      operationId: GetSescaningMinionsStatus
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanningStatus'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+    post:
+      tags:
+      - Minions
+      description: "Recheck every minion device status (update server status cache).\r\
+        \nNote that this is not the devices scan!\r\nThis scanning only checks every\
+        \ minion API to know the current status."
+      operationId: RescanMinionsStatus
+      parameters:
+      - name: scanNetwork
+        in: query
+        description: Whenever scan also the local networks IP's map or not
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/{minionId}:
+    get:
+      tags:
+      - Minions
+      description: Get minion by id.
+      operationId: GetMinion
+      parameters:
+      - name: minionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Minion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Minion'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+    put:
+      tags:
+      - Minions
+      description: Update minion status.
+      operationId: SetMinion
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Minion status to set.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionStatus'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+    delete:
+      tags:
+      - Minions
+      description: Delete minion from the system.
+      operationId: DeleteMinion
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions:
+    get:
+      tags:
+      - Minions
+      description: Get all minions in the system.
+      operationId: GetMinions
+      parameters: []
+      responses:
+        "200":
+          description: Minions array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Minion'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+    post:
+      tags:
+      - Minions
+      description: Creates a new minion.
+      operationId: CreateMinion
+      parameters: []
+      requestBody:
+        description: The new minion to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Minion'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/{minionId}/ifttt:
+    put:
+      tags:
+      - Minions
+      description: Notify minion status changed by ifttt webhook (https://ifttt.com/maker_webhooks).
+      operationId: NotifyMinionStatusChanged
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Minion key amd status to set.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IftttOnChanged'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - iftttAuth: []
+      x-swagger-router-controller: Minions
+  /operations:
+    get:
+      tags:
+      - Operations
+      description: Get all operations in the system.
+      operationId: GetOperations
+      parameters: []
+      responses:
+        "200":
+          description: Operations array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operation'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+    post:
+      tags:
+      - Operations
+      description: Creates a new operation.
+      operationId: CreateOperation
+      parameters: []
+      requestBody:
+        description: The new operation to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operation'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+  /operations/{operationId}:
+    get:
+      tags:
+      - Operations
+      description: Get operation by id.
+      operationId: GetOperation
+      parameters:
+      - name: operationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+    put:
+      tags:
+      - Operations
+      description: Update operation properties.
+      operationId: SetOperation
+      parameters:
+      - name: operationId
+        in: path
+        description: OperationId id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Operation object to update to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operation'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+    delete:
+      tags:
+      - Operations
+      description: Delete operation from the system.
+      operationId: DeleteOperation
+      parameters:
+      - name: operationId
+        in: path
+        description: Operation id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+  /operations/trigger/{operationId}:
+    post:
+      tags:
+      - Operations
+      description: Invoke operation.
+      operationId: TriggerOperation
+      parameters:
+      - name: operationId
+        in: path
+        description: Operation id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Array of minions set status errors (if any).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OperationResult'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Operations
+  /rf/devices:
+    get:
+      tags:
+      - RF
+      description: Get all aupported devices in commands repo see https://github.com/casanet/rf-commands-repo
+        API.
+      operationId: GetCommandsRepoAvailableDevices
+      parameters: []
+      responses:
+        "200":
+          description: supported devices collection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommandsRepoDevice'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: RF
+  /rf/fetch-commands/{minionId}:
+    put:
+      tags:
+      - RF
+      description: Fetch commands set for certain minion see https://github.com/casanet/rf-commands-repo
+        API.
+      operationId: FetchDeviceCommandsToMinion
+      parameters:
+      - name: minionId
+        in: path
+        description: minion to fetch commands for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: devices commands set to fetch.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandsRepoDevice'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: RF
+  /rf/record/{minionId}:
+    post:
+      tags:
+      - RF
+      description: "Record a command (IR, 433-RF or any other supported RF tech)\r\
+        \nfor current minion status."
+      operationId: RecordMinionCommand
+      parameters:
+      - name: minionId
+        in: path
+        description: Minon id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Minion object status to get command for.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionStatus'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: RF
+  /rf/generate/{minionId}:
+    post:
+      tags:
+      - RF
+      description: "Generate a command (IR, 433-RF or any other supported RF tech)\r\
+        \nfor current minion status."
+      operationId: GenerateMinionCommand
+      parameters:
+      - name: minionId
+        in: path
+        description: Minon id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Minion object status to generate command for.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionStatus'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: RF
+  /remote:
+    get:
+      tags:
+      - Remote
+      description: "Get remote server host/IP.\r\nor empty if not set."
+      operationId: GetRemoteHost
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Remote
+    put:
+      tags:
+      - Remote
+      description: Connect to remote server with given remote settings.
+      operationId: SetRemoteSettings
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteSettings'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Remote
+    delete:
+      tags:
+      - Remote
+      description: Remove and disconnect remote server connection.
+      operationId: RemoveRemoteSettings
+      parameters: []
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Remote
+  /remote/status:
+    get:
+      tags:
+      - Remote
+      description: Get connection status to remote status.
+      operationId: GetConnectionStatus
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteConnectionStatus'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Remote
+  /remote/machine-mac:
+    get:
+      tags:
+      - Remote
+      description: "Get local casa-server machine mac address.\r\nUsed when creating\
+        \ a new local server in a remote server."
+      operationId: GetMachineMac
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Remote
+  /timings:
+    get:
+      tags:
+      - Timings
+      description: Get all the timings in the system.
+      operationId: GetTimings
+      parameters: []
+      responses:
+        "200":
+          description: Timings array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timing'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Timings
+    post:
+      tags:
+      - Timings
+      description: Creates a new timing.
+      operationId: CreateTiming
+      parameters: []
+      requestBody:
+        description: The new timing to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timing'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Timings
+  /timings/{timingId}:
+    get:
+      tags:
+      - Timings
+      description: Get timing by id.
+      operationId: GetTiming
+      parameters:
+      - name: timingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Timing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timing'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Timings
+    put:
+      tags:
+      - Timings
+      description: Update timing properties.
+      operationId: SetTiming
+      parameters:
+      - name: timingId
+        in: path
+        description: Timing id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Timing object to update to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timing'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Timings
+    delete:
+      tags:
+      - Timings
+      description: Delete timing from the system.
+      operationId: DeleteTiming
+      parameters:
+      - name: timingId
+        in: path
+        description: Timing id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Timings
+  /users/profile:
+    get:
+      tags:
+      - Users
+      description: Get user profile.
+      operationId: GetProfile
+      parameters: []
+      responses:
+        "200":
+          description: User.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+  /users/forward-auth/{userId}:
+    post:
+      tags:
+      - Users
+      description: Request registration code.
+      operationId: RequestUserForwarding
+      parameters:
+      - name: userId
+        in: path
+        description: User id/email to send code to.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+  /users/forward:
+    get:
+      tags:
+      - Users
+      description: Get registered users for forwarding from remote to local.
+      operationId: GetRegisteredUsers
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+  /users/forward/{userId}:
+    post:
+      tags:
+      - Users
+      description: Register account to allow forward HTTP requests from remote to
+        local server.
+      operationId: RequestUserForwardingAuth
+      parameters:
+      - name: userId
+        in: path
+        description: User id/email to register.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForwardAuth'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+    delete:
+      tags:
+      - Users
+      description: Remove account from local server valid account to forward from
+        remote to local
+      operationId: RemoveUserForwarding
+      parameters:
+      - name: userId
+        in: path
+        description: User id/email to unregister.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+  /users:
+    get:
+      tags:
+      - Users
+      description: Get all users in the system.
+      operationId: GetUsers
+      parameters: []
+      responses:
+        "200":
+          description: Users array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Users
+    post:
+      tags:
+      - Users
+      description: Creates a new user.
+      operationId: CreateUser
+      parameters: []
+      requestBody:
+        description: The new user to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Users
+  /users/{userId}:
+    get:
+      tags:
+      - Users
+      description: Get user by id.
+      operationId: GetUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+    put:
+      tags:
+      - Users
+      description: Update user properties.
+      operationId: SetUser
+      parameters:
+      - name: userId
+        in: path
+        description: User id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: User object to update to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+    delete:
+      tags:
+      - Users
+      description: Delete user from the system.
+      operationId: DeleteUser
+      parameters:
+      - name: userId
+        in: path
+        description: User id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Users
+  /version/latest:
+    put:
+      tags:
+      - Version
+      description: Update Casanet application to the latest version (Restart required
+        for the version update complete).
+      operationId: UpdateVersion
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResults'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      x-swagger-router-controller: Version
+  /version/update-status:
+    get:
+      tags:
+      - Version
+      description: Get current version update progress status
+      operationId: GetUpdateStatus
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionUpdateStatus'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Version
+  /version:
+    get:
+      tags:
+      - Version
+      description: Get current version.
+      operationId: GetCurrentVersion
+      parameters: []
+      responses:
+        "200":
+          description: Current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionInfo'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Version
+  /version/is-up-date:
+    get:
+      tags:
+      - Version
+      description: "Detect if the current version is last, and if not return the latest\
+        \ version."
+      operationId: IsLatestVersion
+      parameters: []
+      responses:
+        "200":
+          description: "Empty if latest, if not the version name."
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - adminAuth: []
+      - userAuth: []
+      x-swagger-router-controller: Version
+components:
+  schemas:
+    ErrorResponse:
+      required:
+      - responseCode
+      type: object
+      properties:
+        responseCode:
+          type: number
+          description: error code in system.
+          format: double
+        message:
+          type: string
+          description: Readable message.
+      additionalProperties: false
+      description: Error response.
+      example:
+        message: message
+        responseCode: 7.061401241503109105224211816675961017608642578125
+    Login:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        localServerId:
+          type: string
+          description: Optional for remote request forwards only
+      additionalProperties: false
+      description: Login schema model.
+    LoginMfa:
+      required:
+      - email
+      - mfa
+      type: object
+      properties:
+        email:
+          type: string
+        mfa:
+          type: string
+        localServerId:
+          type: string
+          description: Optional for remote request forwards only
+      additionalProperties: false
+    LocalNetworkDevice:
+      required:
+      - mac
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name.
+        mac:
+          type: string
+          description: "The MAC address of the device, the value is unique to each\
+            \ device."
+        vendor:
+          type: string
+          description: Info about device manufacturer.
+        ip:
+          type: string
+          description: "The device IP address, if exist it should be unique in network."
+      additionalProperties: false
+      description: Represents any physical device in a local network.
+      example:
+        vendor: vendor
+        ip: ip
+        name: name
+        mac: mac
+    MinionTypes:
+      type: string
+      description: Supported minions types.
+      enum:
+      - toggle
+      - switch
+      - roller
+      - cleaner
+      - airConditioning
+      - light
+      - temperatureLight
+      - colorLight
+    DeviceKind:
+      required:
+      - brand
+      - isFetchCommandsAvailable
+      - isIdRequired
+      - isRecordingSupported
+      - isTokenRequired
+      - minionsPerDevice
+      - model
+      - supportedMinionType
+      type: object
+      properties:
+        brand:
+          type: string
+          description: The brand of the current minion type. (see device model).
+        model:
+          type: string
+          description: The specific model of minion type. (see device model).
+        minionsPerDevice:
+          type: number
+          description: "The max minions that can be in one device, or -1 if unlimited.\r\
+            \nFor example, a simple smart socket can be 1 minion per device,\r\nWall\
+            \ switch with 3 switches can be 3 minions per device,\r\nAnd IR transmitter\
+            \ can be unlimited minions per device."
+          format: double
+        isTokenRequired:
+          type: boolean
+          description: Is the device require a token for communication API.
+        isIdRequired:
+          type: boolean
+          description: Is device require id for communication API.
+        supportedMinionType:
+          $ref: '#/components/schemas/MinionTypes'
+        isRecordingSupported:
+          type: boolean
+          description: Some of the devices supported recording (for example IR transmitter).
+        isFetchCommandsAvailable:
+          type: boolean
+          description: "Whenever the device and module supported fetching commands\
+            \ data from \r\nthe https://github.com/casanet/rf-commands-repo project"
+      additionalProperties: false
+      description: "For each supported device, there are limitations and abilities\
+        \ of it."
+      example:
+        isFetchCommandsAvailable: true
+        isIdRequired: true
+        isTokenRequired: true
+        model: model
+        minionsPerDevice: 0.80082819046101150206595775671303272247314453125
+        supportedMinionType: toggle
+        brand: brand
+        isRecordingSupported: true
+    FeedEvent:
+      type: string
+      description: Feed update type enum.
+      enum:
+      - created
+      - update
+      - removed
+    MinionDevice:
+      required:
+      - brand
+      - model
+      - pysicalDevice
+      type: object
+      properties:
+        pysicalDevice:
+          $ref: '#/components/schemas/LocalNetworkDevice'
+        brand:
+          type: string
+          description: The brand of device.
+        model:
+          type: string
+          description: The specific model of the device.
+        token:
+          type: string
+          description: Some devices require a token for communication API.
+        deviceId:
+          type: string
+          description: Some devices require id for communication API.
+      additionalProperties: false
+      description: Represents a physical device kind with network info.
+      example:
+        pysicalDevice:
+          vendor: vendor
+          ip: ip
+          name: name
+          mac: mac
+        model: model
+        brand: brand
+        deviceId: deviceId
+        token: token
+    SwitchOptions:
+      type: string
+      description: Switches option
+      enum:
+      - "on"
+      - "off"
+    Toggle:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+      additionalProperties: false
+      description: "A toggle value, the toggle is on way communicated device,\r\n\
+        For example wall light switches with 433 RF that can turn on or off\r\nbut\
+        \ there is no way to know the real light status if someone changes the light\
+        \ status using physical switch."
+      example:
+        status: "on"
+    Switch:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+      additionalProperties: false
+      description: "A switch status.\r\n Used for simple devices that can be turned\
+        \ on or off. *and minion status is readable*\r\nThe properties same as a toggle,\
+        \ and the difference is logic only (if that status is readable or not)."
+      example:
+        status: null
+    RollerDirection:
+      type: string
+      description: Roller direction
+      enum:
+      - up
+      - down
+    Roller:
+      required:
+      - direction
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        direction:
+          $ref: '#/components/schemas/RollerDirection'
+      additionalProperties: false
+      description: "A roller switch status.\r\nA roller is a switch for curtains or\
+        \ blinds (or for any other needs) that can drag up/down or stop."
+      example:
+        status: null
+        direction: up
+    CleanerMode:
+      type: string
+      description: Cleaner mode
+      enum:
+      - dock
+      - clean
+    FanStrengthOptions:
+      type: string
+      description: Valid fan strength.
+      enum:
+      - low
+      - med
+      - high
+      - auto
+    Cleaner:
+      required:
+      - fanSpeed
+      - mode
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        mode:
+          $ref: '#/components/schemas/CleanerMode'
+        fanSpeed:
+          $ref: '#/components/schemas/FanStrengthOptions'
+      additionalProperties: false
+      description: "A Cleaner (robot) status.\r\nCleaner is a smart robot for cleaning\
+        \ home."
+      example:
+        mode: dock
+        fanSpeed: low
+        status: null
+    ACModeOptions:
+      type: string
+      description: Valid AC mode.
+      enum:
+      - hot
+      - cold
+      - dry
+      - auto
+    AirConditioning:
+      required:
+      - fanStrength
+      - mode
+      - status
+      - temperature
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        temperature:
+          maximum: 30
+          minimum: 16
+          type: integer
+          description: Valid AC temperature. (minimum 16° maximum 30°).
+          format: int32
+        mode:
+          $ref: '#/components/schemas/ACModeOptions'
+        fanStrength:
+          $ref: '#/components/schemas/FanStrengthOptions'
+      additionalProperties: false
+      description: An AC status.
+      example:
+        mode: hot
+        temperature: 17
+        fanStrength: null
+        status: null
+    Light:
+      required:
+      - brightness
+      - status
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        brightness:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Minimum 1% maximum 100% of light brightness.
+          format: int32
+      additionalProperties: false
+      description: "A simple light status.\r\nUsed to devices that can chang it's\
+        \ brightness."
+      example:
+        brightness: 60
+        status: null
+    TemperatureLight:
+      required:
+      - brightness
+      - status
+      - temperature
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        brightness:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Minimum 1% maximum 100% of light brightness.
+          format: int32
+        temperature:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Spectrum is 1% to warm light and 100% to cold light.
+          format: int32
+      additionalProperties: false
+      description: "A light simple light status.\r\nUsed to devices that can chang\
+        \ also light temperature (warm or cold light)."
+      example:
+        brightness: 15
+        temperature: 60
+        status: null
+    ColorLight:
+      required:
+      - blue
+      - brightness
+      - green
+      - red
+      - status
+      - temperature
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        brightness:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Minimum 1% maximum 100% of light brightness.
+          format: int32
+        temperature:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: Spectrum is 1% to warm light and 100% to cold light.
+          format: int32
+        red:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: "Minimum 0 maximum 255 from red color.\r\nValid color value.\
+            \ (8 bits number, minimum 0 maximum 255)."
+          format: int32
+        green:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: "Minimum 0 maximum 255 from green color.\r\nValid color value.\
+            \ (8 bits number, minimum 0 maximum 255)."
+          format: int32
+        blue:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: "Minimum 0 maximum 255 from blue color.\r\nValid color value.\
+            \ (8 bits number, minimum 0 maximum 255)."
+          format: int32
+      additionalProperties: false
+      description: "A light simple light status.\r\nUsed to devices that can change\
+        \ also light color (RGB)."
+      example:
+        red: 180
+        brightness: 56
+        green: 237
+        blue: 92
+        temperature: 23
+        status: null
+    MinionStatus:
+      type: object
+      properties:
+        toggle:
+          $ref: '#/components/schemas/Toggle'
+        switch:
+          $ref: '#/components/schemas/Switch'
+        roller:
+          $ref: '#/components/schemas/Roller'
+        cleaner:
+          $ref: '#/components/schemas/Cleaner'
+        airConditioning:
+          $ref: '#/components/schemas/AirConditioning'
+        light:
+          $ref: '#/components/schemas/Light'
+        temperatureLight:
+          $ref: '#/components/schemas/TemperatureLight'
+        colorLight:
+          $ref: '#/components/schemas/ColorLight'
+      additionalProperties: false
+      description: "Minion status, the available values depend on the minion type."
+      example:
+        airConditioning:
+          mode: hot
+          temperature: 17
+          fanStrength: null
+          status: null
+        light:
+          brightness: 60
+          status: null
+        cleaner:
+          mode: dock
+          fanSpeed: low
+          status: null
+        toggle:
+          status: "on"
+        temperatureLight:
+          brightness: 15
+          temperature: 60
+          status: null
+        roller:
+          status: null
+          direction: up
+        colorLight:
+          red: 180
+          brightness: 56
+          green: 237
+          blue: 92
+          temperature: 23
+          status: null
+        switch:
+          status: null
+    CalibrationMode:
+      type: string
+      enum:
+      - LOCK_ON
+      - LOCK_OFF
+      - SHABBAT
+      - AUTO
+    MinionCalibrate:
+      required:
+      - calibrationCycleMinutes
+      - calibrationMode
+      type: object
+      properties:
+        calibrationCycleMinutes:
+          minimum: 0
+          type: integer
+          description: "Minutes to calibrate status, set 0 to turn off calibration"
+          format: int32
+        calibrationMode:
+          $ref: '#/components/schemas/CalibrationMode'
+      additionalProperties: false
+      description: Used to change the minion calibration property value.
+      example:
+        calibrationCycleMinutes: 0
+        calibrationMode: LOCK_ON
+    Minion:
+      required:
+      - device
+      - minionStatus
+      - minionType
+      - name
+      type: object
+      properties:
+        minionId:
+          type: string
+          description: Minion unique id.
+        name:
+          type: string
+          description: The display name for a minion.
+        device:
+          $ref: '#/components/schemas/MinionDevice'
+        isProperlyCommunicated:
+          type: boolean
+          description: Is communication with device status ok.
+        minionStatus:
+          $ref: '#/components/schemas/MinionStatus'
+        minionType:
+          $ref: '#/components/schemas/MinionTypes'
+        minionAutoTurnOffMS:
+          type: number
+          description: "Auto turns  off duration, *if* set member value then the minion\
+            \ will turn off in X ms after turning it on,\r\nUsed for example in boiler\
+            \ minion etc."
+          format: double
+        calibration:
+          $ref: '#/components/schemas/MinionCalibrate'
+        room:
+          type: string
+          description: Represents the room where the minion is located at.
+      additionalProperties: false
+      description: "Represents a minion in system.\r\nMinion is a logic device in\
+        \ the system, meaning that a device is a physical device and minion is a logic\
+        \ device\r\nthat uses a physical device to switch home kit status. For example,\
+        \ an IR transmitter can be one physical device\r\nfor a few minions, one to\
+        \ central AC control and second for secondary AC control\r\nso in it will\
+        \ be two totally different minions that use one physical device."
+      example:
+        minionAutoTurnOffMS: 2.027123023002321833274663731572218239307403564453125
+        isProperlyCommunicated: true
+        minionType: toggle
+        name: name
+        minionStatus:
+          airConditioning:
+            mode: hot
+            temperature: 17
+            fanStrength: null
+            status: null
+          light:
+            brightness: 60
+            status: null
+          cleaner:
+            mode: dock
+            fanSpeed: low
+            status: null
+          toggle:
+            status: "on"
+          temperatureLight:
+            brightness: 15
+            temperature: 60
+            status: null
+          roller:
+            status: null
+            direction: up
+          colorLight:
+            red: 180
+            brightness: 56
+            green: 237
+            blue: 92
+            temperature: 23
+            status: null
+          switch:
+            status: null
+        device:
+          pysicalDevice:
+            vendor: vendor
+            ip: ip
+            name: name
+            mac: mac
+          model: model
+          brand: brand
+          deviceId: deviceId
+          token: token
+        calibration:
+          calibrationCycleMinutes: 0
+          calibrationMode: LOCK_ON
+        minionId: minionId
+        room: room
+    MinionFeed:
+      required:
+      - event
+      - minion
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/FeedEvent'
+        minion:
+          $ref: '#/components/schemas/Minion'
+      additionalProperties: false
+      description: Minion feed object.
+      example:
+        event: created
+        minion:
+          minionAutoTurnOffMS: 2.027123023002321833274663731572218239307403564453125
+          isProperlyCommunicated: true
+          minionType: toggle
+          name: name
+          minionStatus:
+            airConditioning:
+              mode: hot
+              temperature: 17
+              fanStrength: null
+              status: null
+            light:
+              brightness: 60
+              status: null
+            cleaner:
+              mode: dock
+              fanSpeed: low
+              status: null
+            toggle:
+              status: "on"
+            temperatureLight:
+              brightness: 15
+              temperature: 60
+              status: null
+            roller:
+              status: null
+              direction: up
+            colorLight:
+              red: 180
+              brightness: 56
+              green: 237
+              blue: 92
+              temperature: 23
+              status: null
+            switch:
+              status: null
+          device:
+            pysicalDevice:
+              vendor: vendor
+              ip: ip
+              name: name
+              mac: mac
+            model: model
+            brand: brand
+            deviceId: deviceId
+            token: token
+          calibration:
+            calibrationCycleMinutes: 0
+            calibrationMode: LOCK_ON
+          minionId: minionId
+          room: room
+    OperationActivity:
+      required:
+      - minionId
+      - minionStatus
+      type: object
+      properties:
+        minionId:
+          type: string
+          description: Minion id to set
+        minionStatus:
+          $ref: '#/components/schemas/MinionStatus'
+      additionalProperties: false
+      description: Represents activity.
+      example:
+        minionStatus:
+          airConditioning:
+            mode: hot
+            temperature: 17
+            fanStrength: null
+            status: null
+          light:
+            brightness: 60
+            status: null
+          cleaner:
+            mode: dock
+            fanSpeed: low
+            status: null
+          toggle:
+            status: "on"
+          temperatureLight:
+            brightness: 15
+            temperature: 60
+            status: null
+          roller:
+            status: null
+            direction: up
+          colorLight:
+            red: 180
+            brightness: 56
+            green: 237
+            blue: 92
+            temperature: 23
+            status: null
+          switch:
+            status: null
+        minionId: minionId
+    TimingTypes:
+      type: string
+      description: Supported timings types.
+      enum:
+      - dailySunTrigger
+      - dailyTimeTrigger
+      - once
+      - timeout
+    SunTriggerOptions:
+      type: string
+      description: Sun triggers.
+      enum:
+      - sunrise
+      - sunset
+    DaysOptions:
+      type: string
+      description: Days in week.
+      enum:
+      - sunday
+      - monday
+      - tuesday
+      - wednesday
+      - thursday
+      - friday
+      - saturday
+    DailySunTrigger:
+      required:
+      - days
+      - durationMinutes
+      - sunTrigger
+      type: object
+      properties:
+        days:
+          type: array
+          description: Selected days in a week.
+          items:
+            $ref: '#/components/schemas/DaysOptions'
+        durationMinutes:
+          type: number
+          description: "Minutes from the sun trigger.\r\ncan be before or after the\
+            \ sun triggers.\r\nFor example, to invoke 40 minutes before sunset set\
+            \ -40 and to invoke 40 minutes after sunset set 40.\r\n\r\nNOTE! if the\
+            \ duration is more then minutes available in the day from the sun trigger\
+            \ time, the timing will not activate.\r\nfor example if the sunset is\
+            \ in 18:00 and the duration set to 7*60 minutes,\r\nthe activate time\
+            \ is not on the same day, so it will not activate at all."
+          format: double
+        sunTrigger:
+          $ref: '#/components/schemas/SunTriggerOptions'
+      additionalProperties: false
+      description: Daily timing based on sun triggers.
+      example:
+        durationMinutes: 0.80082819046101150206595775671303272247314453125
+        days:
+        - sunday
+        - sunday
+        sunTrigger: sunrise
+    DailyTimeTrigger:
+      required:
+      - days
+      - hour
+      - minutes
+      type: object
+      properties:
+        days:
+          type: array
+          description: Selected days in a week.
+          items:
+            $ref: '#/components/schemas/DaysOptions'
+        hour:
+          maximum: 23
+          minimum: 0
+          type: integer
+          description: The hour in a day.
+          format: int32
+        minutes:
+          maximum: 59
+          minimum: 0
+          type: integer
+          description: Minutes in an hour.
+          format: int32
+      additionalProperties: false
+      description: Daily timing based on time in a day.
+      example:
+        hour: 13
+        minutes: 8
+        days:
+        - null
+        - null
+    OnceTiming:
+      required:
+      - date
+      type: object
+      properties:
+        date:
+          type: number
+          description: UTC time.
+          format: double
+      additionalProperties: false
+      description: Once timing structure.
+      example:
+        date: 5.962133916683182377482808078639209270477294921875
+    TimeoutTiming:
+      required:
+      - durationInMinutes
+      - startDate
+      type: object
+      properties:
+        startDate:
+          type: number
+          description: UTC time.
+          format: double
+        durationInMinutes:
+          type: number
+          description: Duration to activate timing from the start timeout time in
+            minutes.
+          format: double
+      additionalProperties: false
+      description: Timeout timing structure.
+      example:
+        durationInMinutes: 2.3021358869347654518833223846741020679473876953125
+        startDate: 5.63737665663332876420099637471139430999755859375
+    TimingProperties:
+      type: object
+      properties:
+        dailySunTrigger:
+          $ref: '#/components/schemas/DailySunTrigger'
+        dailyTimeTrigger:
+          $ref: '#/components/schemas/DailyTimeTrigger'
+        once:
+          $ref: '#/components/schemas/OnceTiming'
+        timeout:
+          $ref: '#/components/schemas/TimeoutTiming'
+      additionalProperties: false
+      description: "Timing properties, values depend on timing type."
+      example:
+        dailyTimeTrigger:
+          hour: 13
+          minutes: 8
+          days:
+          - null
+          - null
+        once:
+          date: 5.962133916683182377482808078639209270477294921875
+        timeout:
+          durationInMinutes: 2.3021358869347654518833223846741020679473876953125
+          startDate: 5.63737665663332876420099637471139430999755859375
+        dailySunTrigger:
+          durationMinutes: 0.80082819046101150206595775671303272247314453125
+          days:
+          - sunday
+          - sunday
+          sunTrigger: sunrise
+    Timing:
+      required:
+      - isActive
+      - timingId
+      - timingProperties
+      - timingType
+      type: object
+      properties:
+        timingId:
+          type: string
+          description: Timing unique id.
+        timingName:
+          type: string
+          description: Timing display name.
+        triggerOperationId:
+          type: string
+          description: Operation id to invoke (optional).
+        triggerDirectAction:
+          $ref: '#/components/schemas/OperationActivity'
+        isActive:
+          type: boolean
+          description: Is timing active or not.
+        timingType:
+          $ref: '#/components/schemas/TimingTypes'
+        timingProperties:
+          $ref: '#/components/schemas/TimingProperties'
+        lockStatus:
+          type: boolean
+          description: Lock the status that changed by the timing (default false)
+        shabbatMode:
+          type: boolean
+          description: Set minion lock to be Shabbat mode
+        overrideLock:
+          type: boolean
+          description: "Override lock, if exists (default false)"
+      additionalProperties: false
+      description: Represents a timing in the system.
+      example:
+        timingProperties:
+          dailyTimeTrigger:
+            hour: 13
+            minutes: 8
+            days:
+            - null
+            - null
+          once:
+            date: 5.962133916683182377482808078639209270477294921875
+          timeout:
+            durationInMinutes: 2.3021358869347654518833223846741020679473876953125
+            startDate: 5.63737665663332876420099637471139430999755859375
+          dailySunTrigger:
+            durationMinutes: 0.80082819046101150206595775671303272247314453125
+            days:
+            - sunday
+            - sunday
+            sunTrigger: sunrise
+        shabbatMode: true
+        triggerDirectAction:
+          minionStatus:
+            airConditioning:
+              mode: hot
+              temperature: 17
+              fanStrength: null
+              status: null
+            light:
+              brightness: 60
+              status: null
+            cleaner:
+              mode: dock
+              fanSpeed: low
+              status: null
+            toggle:
+              status: "on"
+            temperatureLight:
+              brightness: 15
+              temperature: 60
+              status: null
+            roller:
+              status: null
+              direction: up
+            colorLight:
+              red: 180
+              brightness: 56
+              green: 237
+              blue: 92
+              temperature: 23
+              status: null
+            switch:
+              status: null
+          minionId: minionId
+        triggerOperationId: triggerOperationId
+        lockStatus: true
+        timingId: timingId
+        overrideLock: true
+        timingName: timingName
+        timingType: dailySunTrigger
+        isActive: true
+    OperationResult:
+      required:
+      - minionId
+      type: object
+      properties:
+        minionId:
+          type: string
+          description: Minion Id.
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+      additionalProperties: false
+      description: "Operation result s, hold set minion status result per minion."
+      example:
+        error:
+          message: message
+          responseCode: 7.061401241503109105224211816675961017608642578125
+        minionId: minionId
+    TimingFeed:
+      required:
+      - results
+      - timing
+      type: object
+      properties:
+        timing:
+          $ref: '#/components/schemas/Timing'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationResult'
+      additionalProperties: false
+      description: Timing feed object.
+      example:
+        timing:
+          timingProperties:
+            dailyTimeTrigger:
+              hour: 13
+              minutes: 8
+              days:
+              - null
+              - null
+            once:
+              date: 5.962133916683182377482808078639209270477294921875
+            timeout:
+              durationInMinutes: 2.3021358869347654518833223846741020679473876953125
+              startDate: 5.63737665663332876420099637471139430999755859375
+            dailySunTrigger:
+              durationMinutes: 0.80082819046101150206595775671303272247314453125
+              days:
+              - sunday
+              - sunday
+              sunTrigger: sunrise
+          shabbatMode: true
+          triggerDirectAction:
+            minionStatus:
+              airConditioning:
+                mode: hot
+                temperature: 17
+                fanStrength: null
+                status: null
+              light:
+                brightness: 60
+                status: null
+              cleaner:
+                mode: dock
+                fanSpeed: low
+                status: null
+              toggle:
+                status: "on"
+              temperatureLight:
+                brightness: 15
+                temperature: 60
+                status: null
+              roller:
+                status: null
+                direction: up
+              colorLight:
+                red: 180
+                brightness: 56
+                green: 237
+                blue: 92
+                temperature: 23
+                status: null
+              switch:
+                status: null
+            minionId: minionId
+          triggerOperationId: triggerOperationId
+          lockStatus: true
+          timingId: timingId
+          overrideLock: true
+          timingName: timingName
+          timingType: dailySunTrigger
+          isActive: true
+        results:
+        - error:
+            message: message
+            responseCode: 7.061401241503109105224211816675961017608642578125
+          minionId: minionId
+        - error:
+            message: message
+            responseCode: 7.061401241503109105224211816675961017608642578125
+          minionId: minionId
+    IftttIntegrationSettings:
+      required:
+      - enableIntegration
+      type: object
+      properties:
+        apiKey:
+          type: string
+          description: WebHooks API key
+        enableIntegration:
+          type: boolean
+          description: Open or close ifttt integration.
+      additionalProperties: false
+      description: Ifttt integration settings
+    IftttRawActionTriggered:
+      required:
+      - apiKey
+      - minionId
+      - setStatus
+      type: object
+      properties:
+        apiKey:
+          type: string
+          description: WebHooks API key
+        localMac:
+          type: string
+          description: Allow remote-server to forward request to local server
+        minionId:
+          type: string
+        setStatus:
+          $ref: '#/components/schemas/SwitchOptions'
+      additionalProperties: false
+      description: Ifttt trigger with all request data in one JSON structure.
+    IftttActionTriggered:
+      required:
+      - apiKey
+      - setStatus
+      type: object
+      properties:
+        apiKey:
+          type: string
+          description: WebHooks API key
+        localMac:
+          type: string
+          description: Allow remote-server to forward request to local server
+        setStatus:
+          $ref: '#/components/schemas/SwitchOptions'
+      additionalProperties: false
+      description: Ifttt trigger set status action
+    IftttActionTriggeredRequest:
+      required:
+      - apiKey
+      type: object
+      properties:
+        apiKey:
+          type: string
+          description: WebHooks API key
+        localMac:
+          type: string
+          description: Allow remote-server to forward request to local server
+      additionalProperties: false
+      description: Ifttt trigger action auth and forward fields
+    MinionTimeline:
+      required:
+      - minionId
+      - status
+      - timestamp
+      type: object
+      properties:
+        minionId:
+          type: string
+        timestamp:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/MinionStatus'
+      additionalProperties: false
+      description: Minion timeline node
+      example:
+        minionId: minionId
+        timestamp: 0.80082819046101150206595775671303272247314453125
+        status:
+          airConditioning:
+            mode: hot
+            temperature: 17
+            fanStrength: null
+            status: null
+          light:
+            brightness: 60
+            status: null
+          cleaner:
+            mode: dock
+            fanSpeed: low
+            status: null
+          toggle:
+            status: "on"
+          temperatureLight:
+            brightness: 15
+            temperature: 60
+            status: null
+          roller:
+            status: null
+            direction: up
+          colorLight:
+            red: 180
+            brightness: 56
+            green: 237
+            blue: 92
+            temperature: 23
+            status: null
+          switch:
+            status: null
+    MinionRename:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name to set.
+      additionalProperties: false
+      description: Used to rename minion.
+    MinionSetRoomName:
+      required:
+      - room
+      type: object
+      properties:
+        room:
+          type: string
+          description: The new room name to set.
+      additionalProperties: false
+      description: Used to set minion room name.
+    SetMinionAutoTurnOff:
+      required:
+      - setAutoTurnOffMS
+      type: object
+      properties:
+        setAutoTurnOffMS:
+          type: number
+          description: "The timeout duration in ms, to turn off set 0 as valse."
+          format: double
+      additionalProperties: false
+      description: Used to change the minion auto turn off the timeout value.
+    ProgressStatus:
+      type: string
+      description: Long-time job status
+      enum:
+      - inProgress
+      - finished
+      - fail
+    ScanningStatus:
+      required:
+      - scanningStatus
+      type: object
+      properties:
+        scanningStatus:
+          $ref: '#/components/schemas/ProgressStatus'
+      additionalProperties: false
+      description: Scanning progress status
+      example:
+        scanningStatus: inProgress
+    IftttOnChanged:
+      required:
+      - deviceId
+      - newStatus
+      type: object
+      properties:
+        localMac:
+          type: string
+          description: Allow remote-server to forward request to local server
+        deviceId:
+          type: string
+          description: "Device id (AKA Ifttt webhook API key), this is the authentication\
+            \ of request."
+        newStatus:
+          $ref: '#/components/schemas/SwitchOptions'
+      additionalProperties: false
+      description: "Ifttt webhook request body to notify minion status changed.\r\n\
+        *Used in ifttt module interface only*"
+    Operation:
+      required:
+      - activities
+      - operationId
+      - operationName
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation unique id.
+        operationName:
+          type: string
+          description: Operation display name.
+        activities:
+          type: array
+          description: Activities array.
+          items:
+            $ref: '#/components/schemas/OperationActivity'
+      additionalProperties: false
+      description: "Represents an operation in the system.\r\nAn operation is a set\
+        \ of activities to do.\r\nFor example, to turn on all home light operation\r\
+        \nsets an array of activity for each light in the home to set light status\
+        \ 'on'."
+      example:
+        activities:
+        - minionStatus:
+            airConditioning:
+              mode: hot
+              temperature: 17
+              fanStrength: null
+              status: null
+            light:
+              brightness: 60
+              status: null
+            cleaner:
+              mode: dock
+              fanSpeed: low
+              status: null
+            toggle:
+              status: "on"
+            temperatureLight:
+              brightness: 15
+              temperature: 60
+              status: null
+            roller:
+              status: null
+              direction: up
+            colorLight:
+              red: 180
+              brightness: 56
+              green: 237
+              blue: 92
+              temperature: 23
+              status: null
+            switch:
+              status: null
+          minionId: minionId
+        - minionStatus:
+            airConditioning:
+              mode: hot
+              temperature: 17
+              fanStrength: null
+              status: null
+            light:
+              brightness: 60
+              status: null
+            cleaner:
+              mode: dock
+              fanSpeed: low
+              status: null
+            toggle:
+              status: "on"
+            temperatureLight:
+              brightness: 15
+              temperature: 60
+              status: null
+            roller:
+              status: null
+              direction: up
+            colorLight:
+              red: 180
+              brightness: 56
+              green: 237
+              blue: 92
+              temperature: 23
+              status: null
+            switch:
+              status: null
+          minionId: minionId
+        operationId: operationId
+        operationName: operationName
+    CommandsRepoDevice:
+      required:
+      - brand
+      - category
+      - model
+      type: object
+      properties:
+        brand:
+          type: string
+        model:
+          type: string
+        category:
+          $ref: '#/components/schemas/MinionTypes'
+      additionalProperties: false
+      description: Device in commands repo project. see https://github.com/casanet/rf-commands-repo.
+        API section
+      example:
+        model: model
+        category: toggle
+        brand: brand
+    RemoteConnectionStatus:
+      type: string
+      description: Optional status on a remote connection
+      enum:
+      - notConfigured
+      - cantReachRemoteServer
+      - authorizationFail
+      - localServerDisconnected
+      - connectionOK
+    RemoteSettings:
+      required:
+      - connectionKey
+      - host
+      type: object
+      properties:
+        host:
+          type: string
+          description: hostname / IP of the remote server
+        connectionKey:
+          type: string
+          description: Access key for authorization local server in the remote server
+      additionalProperties: false
+      description: Remote server settings.
+    AuthScopes:
+      type: string
+      description: "Scopes of authentication, right know in our system there are only\
+        \ 3 scopes.\r\nadmin and user. any API route protect by one of them."
+      enum:
+      - adminAuth
+      - userAuth
+      - iftttAuth
+    User:
+      required:
+      - email
+      - ignoreTfa
+      - scope
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Name
+        email:
+          type: string
+          description: User email
+        password:
+          minLength: 8
+          type: string
+          description: User password.
+        ignoreTfa:
+          type: boolean
+          description: Ignore 2-step verification on login or not.
+        scope:
+          $ref: '#/components/schemas/AuthScopes'
+        passwordChangeRequired:
+          type: boolean
+          description: "Whenever the user required to set new password, during default\
+            \ password usage, password expiration, etc."
+      additionalProperties: false
+      description: Represents a user in the system.
+      example:
+        password: password
+        passwordChangeRequired: true
+        displayName: displayName
+        scope: adminAuth
+        ignoreTfa: true
+        email: email
+    UserForwardAuth:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          maxLength: 6
+          minLength: 6
+          type: string
+          description: Generated code that sent to user email account
+      additionalProperties: false
+    UpdateResults:
+      required:
+      - alreadyUpToDate
+      type: object
+      properties:
+        alreadyUpToDate:
+          type: boolean
+          description: Application already in the latest version
+      additionalProperties: false
+      description: Update version results
+      example:
+        alreadyUpToDate: true
+    VersionUpdateStatus:
+      required:
+      - updateStatus
+      type: object
+      properties:
+        updateStatus:
+          $ref: '#/components/schemas/ProgressStatus'
+      additionalProperties: false
+      description: Version update progress status
+      example:
+        updateStatus: inProgress
+    VersionInfo:
+      required:
+      - commitHash
+      - timestamp
+      - version
+      type: object
+      properties:
+        version:
+          type: string
+          description: Latest version (Git Tag) name
+        commitHash:
+          type: string
+          description: Current local master/HEAD commit hash
+        timestamp:
+          type: number
+          description: Time stamp of HEAD commit in UTC format
+          format: double
+      additionalProperties: false
+      description: Version info
+      example:
+        version: version
+        commitHash: commitHash
+        timestamp: 0.80082819046101150206595775671303272247314453125
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    userAuth:
+      type: apiKey
+      name: authentication
+      in: header
+    adminAuth:
+      type: apiKey
+      name: authentication
+      in: header
+    iftttAuth:
+      type: apiKey
+      name: apiKey
+      in: header
