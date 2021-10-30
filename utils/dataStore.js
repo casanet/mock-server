@@ -25,6 +25,7 @@ exports.currentVersion = {
 	"timestamp": 1635450863000,
 };
 exports.updateStatus = JSON.stringify("finished");
+exports.scanStatus = JSON.stringify("finished");
 exports.commandsRepoAvailableDevices = [{"brand":"electra","category":"airConditioning","model":"relax"},{"brand":"electra","category":"airConditioning","model":"air"},{"brand":"Electra","category":"airConditioning","model":"Unknown (cold)"},{"brand":"tadiran","category":"airConditioning","model":"classic"},{"brand":"tadiran","category":"airConditioning","model":"Classaic - small (cold)"},{"brand":"Tadiran","category":"airConditioning","model":"Classic (cold+hot)"},{"brand":"Electra","category":"airConditioning","model":"Relax (cold+hot)"},{"brand":"Electra","category":"airConditioning","model":"Air (cold+hot)"},{"brand":"Saga","category":"airConditioning","model":"12 X"},{"brand":"LG","category":"toggle","model":"Screen"}];
 exports.connectionStatus = JSON.stringify("connectionOK");
 exports.defaultMinionStatus = { "airConditioning": { "mode": "hot", "temperature": 17, "fanStrength": 'high', "status": 'on' }, "light": { "brightness": 60, "status": 'on' }, "cleaner": { "mode": "dock", "fanSpeed": "low", "status": 'on' }, "toggle": { "status": "on" }, "temperatureLight": { "brightness": 15, "temperature": 60, "status": 'on' }, "roller": { "status": 'on', "direction": "up" }, "colorLight": { "red": 180, "brightness": 56, "green": 237, "blue": 92, "temperature": 23, "status": 'on' }, "switch": { "status": 'on' } };

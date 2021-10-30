@@ -38,7 +38,7 @@ module.exports.getMinionsTimeline = function getMinionsTimeline(req, res, next) 
 };
 
 module.exports.getSescaningMinionsStatus = function getSescaningMinionsStatus(req, res, next) {
-	utils.writeJson(res);
+	utils.writeJson(res, dataStore.scanStatus);
 };
 
 module.exports.notifyMinionStatusChanged = function notifyMinionStatusChanged(req, res, next, body, minionId) {
@@ -66,7 +66,7 @@ module.exports.renameRoom = function renameRoom(req, res, next, body, minionId) 
 };
 
 module.exports.rescanMinionStatus = function rescanMinionStatus(req, res, next, minionId) {
-	utils.writeJson(res);
+	utils.writeJson(res, dataStore.scanStatus);
 };
 
 module.exports.rescanMinionsStatus = function rescanMinionsStatus(req, res, next, scanNetwork) {
