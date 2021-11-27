@@ -34,7 +34,7 @@ module.exports.getMinions = function getMinions(req, res, next) {
 };
 
 module.exports.getMinionsTimeline = function getMinionsTimeline(req, res, next) {
-	utils.writeJson(res);
+	utils.writeJson(res, dataStore.getSessionData(req.session).timeline);
 };
 
 module.exports.getSescaningMinionsStatus = function getSescaningMinionsStatus(req, res, next) {
@@ -77,6 +77,17 @@ module.exports.setMinion = function setMinion(req, res, next, body, minionId) {
 	const data = dataStore.getSessionData(req.session);
 	const minion = data.minions.find(m => m.minionId === minionId);
 	minion.minionStatus = body;
+	const user = data.users.find(u => u.email === data.sessionUser);
+	data.timeline.unshift({
+		minionId,
+		status: body,
+		timestamp: new Date(),
+		trigger: 'user',
+		user: {
+			name: user.displayName,
+			email: user.email,
+		}
+	});
 	dataStore.setSessionData(req.session, data);
 	utils.writeJson(res);
 };

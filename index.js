@@ -3,12 +3,15 @@
 const path = require('path');
 const http = require('http');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const express = require("express");
-
 const oas3Tools = require('@haimkastner/oas3-tools');
 const dataStore = require('./utils/dataStore');
 
+dotenv.config();
+
 const serverPort = process.env.PORT || 8080;
+const localDevMode = !!process.env.DEV_MODE;
 
 console.info(
 	`
@@ -39,7 +42,12 @@ function validate(request, scopes, schema) {
 	const sessionData = dataStore.getSessionData(session);
 	// Keep session directly on the req object
 	request.session = session;
-	// Verify there is data for this session, else, mean mock user not connected 
+	// On DEV mode generate new session on demand
+	if (localDevMode && !sessionData) {
+		dataStore.addSessionData(session, 'dev@dev');
+		return true;
+	}
+	// Verify there is data for this session, else, mean mock user not connected
 	return !!sessionData;
 }
 
@@ -52,8 +60,8 @@ var options = {
 	openApiValidator: {
 		validateSecurity: {
 			handlers: {
-				userAuth  : validate,
-				adminAuth  : validate,
+				userAuth: validate,
+				adminAuth: validate,
 			}
 		}
 	}
