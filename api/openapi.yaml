@@ -8,10 +8,229 @@ info:
     email: haim.kastner@gmail.com
   license:
     name: ISC
-  version: 2.0.0
+  version: 4.0.17
 servers:
-- url: /API
+- url: https://casanet-mock-server.herokuapp.com/API
 paths:
+  /actions:
+    get:
+      tags:
+      - Actions
+      description: Get all the actions in the system.
+      operationId: GetActions
+      parameters: []
+      responses:
+        "200":
+          description: Actions array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Action'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+    post:
+      tags:
+      - Actions
+      description: Creates a new action.
+      operationId: CreateAction
+      parameters: []
+      requestBody:
+        description: The new action to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Action'
+        required: true
+      responses:
+        "200":
+          description: The created action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+  /actions/{actionId}:
+    get:
+      tags:
+      - Actions
+      description: Get action by id.
+      operationId: GetAction
+      parameters:
+      - name: actionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+    put:
+      tags:
+      - Actions
+      description: Update action properties.
+      operationId: SetAction
+      parameters:
+      - name: actionId
+        in: path
+        description: Action id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Action object to update to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Action'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+    delete:
+      tags:
+      - Actions
+      description: Delete action from the system.
+      operationId: DeleteAction
+      parameters:
+      - name: actionId
+        in: path
+        description: Action id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+  /actions/minion/{minionId}:
+    get:
+      tags:
+      - Actions
+      description: Get minion's actions.
+      operationId: GetActionByMinion
+      parameters:
+      - name: minionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Action.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Action'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
+  /actions/set-active/{actionId}:
+    put:
+      tags:
+      - Actions
+      description: Set action active mode
+      operationId: SetActionActive
+      parameters:
+      - name: actionId
+        in: path
+        description: The action to set
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: active
+        in: query
+        description: The mode to set
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Actions
   /auth/login:
     post:
       tags:
@@ -150,6 +369,155 @@ paths:
       security:
       - adminAuth: []
       x-swagger-router-controller: Default
+  /collections:
+    get:
+      tags:
+      - Collections
+      description: Get all the collections in the system.
+      operationId: GetCollections
+      parameters: []
+      responses:
+        "200":
+          description: Collections array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Collections
+    post:
+      tags:
+      - Collections
+      description: Creates a new collection.
+      operationId: CreateCollection
+      parameters: []
+      requestBody:
+        description: The new collection to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Collection'
+        required: true
+      responses:
+        "200":
+          description: The created collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Collections
+  /collections/{collectionId}:
+    get:
+      tags:
+      - Collections
+      description: Get collection by id.
+      operationId: GetCollection
+      parameters:
+      - name: collectionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Collections
+    put:
+      tags:
+      - Collections
+      description: Update collection properties.
+      operationId: SetCollection
+      parameters:
+      - name: collectionId
+        in: path
+        description: Collection id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Collection object to update to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Collection'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Collections
+    delete:
+      tags:
+      - Collections
+      description: Delete collection from the system.
+      operationId: DeleteCollection
+      parameters:
+      - name: collectionId
+        in: path
+        description: Collection id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Collections
   /devices:
     get:
       tags:
@@ -242,9 +610,10 @@ paths:
     post:
       tags:
       - Devices
-      description: "Rescan all devices in LAN.\r\nUsed when there are changes in the\
-        \ local network.\r\nFor example, if the router (DHCP server) change IP's of\
-        \ devices or new device connect to the local network etc."
+      description: |-
+        Rescan all devices in LAN.
+        Used when there are changes in the local network.
+        For example, if the router (DHCP server) change IP's of devices or new device connect to the local network etc.
       operationId: RescanDevices
       parameters: []
       responses:
@@ -264,7 +633,9 @@ paths:
     get:
       tags:
       - Feeds
-      description: "Minions feed.\r\nwhen minion status changed minion created etc."
+      description: |-
+        Minions feed.
+        when minion status changed minion created etc.
       operationId: GetMinionsFeed
       parameters: []
       responses:
@@ -288,7 +659,9 @@ paths:
     get:
       tags:
       - Feeds
-      description: "Timing feed.\r\nwhen timing activated."
+      description: |-
+        Timing feed.
+        when timing activated.
       operationId: GetTimingFeed
       parameters: []
       responses:
@@ -308,153 +681,6 @@ paths:
       - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Feeds
-  /ifttt/settings:
-    get:
-      tags:
-      - Ifttt
-      description: Is IFTTT integration enabled.
-      operationId: IsIftttEnabled
-      parameters: []
-      responses:
-        "200":
-          description: Ok
-          content:
-            application/json:
-              schema:
-                type: boolean
-                x-content-type: application/json
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - adminAuth: []
-      - userAuth: []
-      x-swagger-router-controller: Ifttt
-    put:
-      tags:
-      - Ifttt
-      description: Put ifttt integration settings.
-      operationId: SetIftttIntegrationSettings
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IftttIntegrationSettings'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - adminAuth: []
-      x-swagger-router-controller: Ifttt
-  /ifttt/trigger/minions/raw:
-    post:
-      tags:
-      - Ifttt
-      description: "Ifttt webhooks triggering casa-net action API.\r\nwhen all details\
-        \ in body only, to allow send all data ion one text line.\r\nExample to use:\
-        \ SMS trigger has only simple text that can pass to IFTTT activity,\r\nand\
-        \ by current request, it is possible to control any minion by one single line\
-        \ of text.\r\nso fill the SMS text with JSON and by IFTTT set it to be the\
-        \ request body."
-      operationId: TriggeredSomeAction
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IftttRawActionTriggered'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - iftttAuth: []
-      x-swagger-router-controller: Ifttt
-  /ifttt/trigger/minions/{minionId}:
-    post:
-      tags:
-      - Ifttt
-      description: Ifttt webhooks triggering casa-net *minion* action API.
-      operationId: TriggeredMinionAction
-      parameters:
-      - name: minionId
-        in: path
-        description: minion to set status.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      requestBody:
-        description: status to set.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IftttActionTriggered'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - iftttAuth: []
-      x-swagger-router-controller: Ifttt
-  /ifttt/trigger/operations/{operationId}:
-    post:
-      tags:
-      - Ifttt
-      description: Ifttt webhooks triggering casa-net *operation* action API.
-      operationId: TriggeredOperationAction
-      parameters:
-      - name: operationId
-        in: path
-        description: operation to invoke.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      requestBody:
-        description: Ifttt request auth and redirect data.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IftttActionTriggeredRequest'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - iftttAuth: []
-      x-swagger-router-controller: Ifttt
   /logs:
     get:
       description: Get the last logs of the local-server (download as text file)
@@ -479,6 +705,40 @@ paths:
       description: Get the timeline of minions status.
       operationId: GetMinionsTimeline
       parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MinionTimeline'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/timeline/{minionId}:
+    get:
+      tags:
+      - Minions
+      description: Get the timeline of minions status.
+      operationId: GetMinionTimeline
+      parameters:
+      - name: minionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: Ok
@@ -574,6 +834,41 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MinionSetRoomName'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/network-device/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Replace physical device of given minion.
+      operationId: ReplaceNetworkDevice
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Device mac address to replace to.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MinionSetDevice'
         required: true
       responses:
         "204":
@@ -711,9 +1006,10 @@ paths:
     post:
       tags:
       - Minions
-      description: "Recheck every minion device status (update server status cache).\r\
-        \nNote that this is not the devices scan!\r\nThis scanning only checks every\
-        \ minion API to know the current status."
+      description: |-
+        Recheck every minion device status (update server status cache).
+        Note that this is not the devices scan!
+        This scanning only checks every minion API to know the current status.
       operationId: RescanMinionsStatus
       parameters:
       - name: scanNetwork
@@ -877,40 +1173,6 @@ paths:
       - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Minions
-  /minions/{minionId}/ifttt:
-    put:
-      tags:
-      - Minions
-      description: Notify minion status changed by ifttt webhook (https://ifttt.com/maker_webhooks).
-      operationId: NotifyMinionStatusChanged
-      parameters:
-      - name: minionId
-        in: path
-        description: Minion id.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      requestBody:
-        description: Minion key amd status to set.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IftttOnChanged'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - iftttAuth: []
-      x-swagger-router-controller: Minions
   /operations:
     get:
       tags:
@@ -934,6 +1196,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -960,6 +1223,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -991,6 +1255,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -1025,6 +1290,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -1052,6 +1318,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -1087,6 +1354,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      deprecated: true
       security:
       - userAuth: []
       - adminAuth: []
@@ -1159,8 +1427,9 @@ paths:
     post:
       tags:
       - RF
-      description: "Record a command (IR, 433-RF or any other supported RF tech)\r\
-        \nfor current minion status."
+      description: |-
+        Record a command (IR, 433-RF or any other supported RF tech)
+        for current minion status.
       operationId: RecordMinionCommand
       parameters:
       - name: minionId
@@ -1195,8 +1464,9 @@ paths:
     post:
       tags:
       - RF
-      description: "Generate a command (IR, 433-RF or any other supported RF tech)\r\
-        \nfor current minion status."
+      description: |-
+        Generate a command (IR, 433-RF or any other supported RF tech)
+        for current minion status.
       operationId: GenerateMinionCommand
       parameters:
       - name: minionId
@@ -1231,7 +1501,9 @@ paths:
     get:
       tags:
       - Remote
-      description: "Get remote server host/IP.\r\nor empty if not set."
+      description: |-
+        Get remote server host/IP.
+        or empty if not set.
       operationId: GetRemoteHost
       parameters: []
       responses:
@@ -1322,8 +1594,9 @@ paths:
     get:
       tags:
       - Remote
-      description: "Get local casa-server machine mac address.\r\nUsed when creating\
-        \ a new local server in a remote server."
+      description: |-
+        Get local casa-server machine mac address.
+        Used when creating a new local server in a remote server.
       operationId: GetMachineMac
       parameters: []
       responses:
@@ -1873,181 +2146,6 @@ paths:
       x-swagger-router-controller: Version
 components:
   schemas:
-    ErrorResponse:
-      required:
-      - responseCode
-      type: object
-      properties:
-        responseCode:
-          type: number
-          description: error code in system.
-          format: double
-        message:
-          type: string
-          description: Readable message.
-      additionalProperties: false
-      description: Error response.
-      example:
-        message: message
-        responseCode: 7.061401241503109105224211816675961017608642578125
-    Login:
-      required:
-      - email
-      - password
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
-        localServerId:
-          type: string
-          description: Optional for remote request forwards only
-      additionalProperties: false
-      description: Login schema model.
-    LoginMfa:
-      required:
-      - email
-      - mfa
-      type: object
-      properties:
-        email:
-          type: string
-        mfa:
-          type: string
-        localServerId:
-          type: string
-          description: Optional for remote request forwards only
-      additionalProperties: false
-    LocalNetworkDevice:
-      required:
-      - mac
-      type: object
-      properties:
-        name:
-          type: string
-          description: Display name.
-        mac:
-          type: string
-          description: "The MAC address of the device, the value is unique to each\
-            \ device."
-        vendor:
-          type: string
-          description: Info about device manufacturer.
-        ip:
-          type: string
-          description: "The device IP address, if exist it should be unique in network."
-      additionalProperties: false
-      description: Represents any physical device in a local network.
-      example:
-        vendor: vendor
-        ip: ip
-        name: name
-        mac: mac
-    MinionTypes:
-      type: string
-      description: Supported minions types.
-      enum:
-      - toggle
-      - switch
-      - roller
-      - cleaner
-      - airConditioning
-      - light
-      - temperatureLight
-      - colorLight
-    DeviceKind:
-      required:
-      - brand
-      - isFetchCommandsAvailable
-      - isIdRequired
-      - isRecordingSupported
-      - isTokenRequired
-      - minionsPerDevice
-      - model
-      - supportedMinionType
-      type: object
-      properties:
-        brand:
-          type: string
-          description: The brand of the current minion type. (see device model).
-        model:
-          type: string
-          description: The specific model of minion type. (see device model).
-        minionsPerDevice:
-          type: number
-          description: "The max minions that can be in one device, or -1 if unlimited.\r\
-            \nFor example, a simple smart socket can be 1 minion per device,\r\nWall\
-            \ switch with 3 switches can be 3 minions per device,\r\nAnd IR transmitter\
-            \ can be unlimited minions per device."
-          format: double
-        isTokenRequired:
-          type: boolean
-          description: Is the device require a token for communication API.
-        isIdRequired:
-          type: boolean
-          description: Is device require id for communication API.
-        supportedMinionType:
-          $ref: '#/components/schemas/MinionTypes'
-        isRecordingSupported:
-          type: boolean
-          description: Some of the devices supported recording (for example IR transmitter).
-        isFetchCommandsAvailable:
-          type: boolean
-          description: "Whenever the device and module supported fetching commands\
-            \ data from \r\nthe https://github.com/casanet/rf-commands-repo project"
-      additionalProperties: false
-      description: "For each supported device, there are limitations and abilities\
-        \ of it."
-      example:
-        isFetchCommandsAvailable: true
-        isIdRequired: true
-        isTokenRequired: true
-        model: model
-        minionsPerDevice: 0.80082819046101150206595775671303272247314453125
-        supportedMinionType: toggle
-        brand: brand
-        isRecordingSupported: true
-    FeedEvent:
-      type: string
-      description: Feed update type enum.
-      enum:
-      - created
-      - update
-      - removed
-    MinionDevice:
-      required:
-      - brand
-      - model
-      - pysicalDevice
-      type: object
-      properties:
-        pysicalDevice:
-          $ref: '#/components/schemas/LocalNetworkDevice'
-        brand:
-          type: string
-          description: The brand of device.
-        model:
-          type: string
-          description: The specific model of the device.
-        token:
-          type: string
-          description: Some devices require a token for communication API.
-        deviceId:
-          type: string
-          description: Some devices require id for communication API.
-      additionalProperties: false
-      description: Represents a physical device kind with network info.
-      example:
-        pysicalDevice:
-          vendor: vendor
-          ip: ip
-          name: name
-          mac: mac
-        model: model
-        brand: brand
-        deviceId: deviceId
-        token: token
     SwitchOptions:
       type: string
       description: Switches option
@@ -2062,10 +2160,10 @@ components:
         status:
           $ref: '#/components/schemas/SwitchOptions'
       additionalProperties: false
-      description: "A toggle value, the toggle is on way communicated device,\r\n\
-        For example wall light switches with 433 RF that can turn on or off\r\nbut\
-        \ there is no way to know the real light status if someone changes the light\
-        \ status using physical switch."
+      description: |-
+        A toggle value, the toggle is on way communicated device,
+        For example wall light switches with 433 RF that can turn on or off
+        but there is no way to know the real light status if someone changes the light status using physical switch.
       example:
         status: "on"
     Switch:
@@ -2076,9 +2174,10 @@ components:
         status:
           $ref: '#/components/schemas/SwitchOptions'
       additionalProperties: false
-      description: "A switch status.\r\n Used for simple devices that can be turned\
-        \ on or off. *and minion status is readable*\r\nThe properties same as a toggle,\
-        \ and the difference is logic only (if that status is readable or not)."
+      description: |-
+        A switch status.
+         Used for simple devices that can be turned on or off. *and minion status is readable*
+        The properties same as a toggle, and the difference is logic only (if that status is readable or not).
       example:
         status: null
     RollerDirection:
@@ -2098,8 +2197,9 @@ components:
         direction:
           $ref: '#/components/schemas/RollerDirection'
       additionalProperties: false
-      description: "A roller switch status.\r\nA roller is a switch for curtains or\
-        \ blinds (or for any other needs) that can drag up/down or stop."
+      description: |-
+        A roller switch status.
+        A roller is a switch for curtains or blinds (or for any other needs) that can drag up/down or stop.
       example:
         status: null
         direction: up
@@ -2131,8 +2231,9 @@ components:
         fanSpeed:
           $ref: '#/components/schemas/FanStrengthOptions'
       additionalProperties: false
-      description: "A Cleaner (robot) status.\r\nCleaner is a smart robot for cleaning\
-        \ home."
+      description: |-
+        A Cleaner (robot) status.
+        Cleaner is a smart robot for cleaning home.
       example:
         mode: dock
         fanSpeed: low
@@ -2187,8 +2288,9 @@ components:
           description: Minimum 1% maximum 100% of light brightness.
           format: int32
       additionalProperties: false
-      description: "A simple light status.\r\nUsed to devices that can chang it's\
-        \ brightness."
+      description: |-
+        A simple light status.
+        Used to devices that can chang it's brightness.
       example:
         brightness: 60
         status: null
@@ -2214,8 +2316,9 @@ components:
           description: Spectrum is 1% to warm light and 100% to cold light.
           format: int32
       additionalProperties: false
-      description: "A light simple light status.\r\nUsed to devices that can chang\
-        \ also light temperature (warm or cold light)."
+      description: |-
+        A light simple light status.
+        Used to devices that can chang also light temperature (warm or cold light).
       example:
         brightness: 15
         temperature: 60
@@ -2248,32 +2351,52 @@ components:
           maximum: 255
           minimum: 0
           type: integer
-          description: "Minimum 0 maximum 255 from red color.\r\nValid color value.\
-            \ (8 bits number, minimum 0 maximum 255)."
+          description: |-
+            Minimum 0 maximum 255 from red color.
+            Valid color value. (8 bits number, minimum 0 maximum 255).
           format: int32
         green:
           maximum: 255
           minimum: 0
           type: integer
-          description: "Minimum 0 maximum 255 from green color.\r\nValid color value.\
-            \ (8 bits number, minimum 0 maximum 255)."
+          description: |-
+            Minimum 0 maximum 255 from green color.
+            Valid color value. (8 bits number, minimum 0 maximum 255).
           format: int32
         blue:
           maximum: 255
           minimum: 0
           type: integer
-          description: "Minimum 0 maximum 255 from blue color.\r\nValid color value.\
-            \ (8 bits number, minimum 0 maximum 255)."
+          description: |-
+            Minimum 0 maximum 255 from blue color.
+            Valid color value. (8 bits number, minimum 0 maximum 255).
           format: int32
       additionalProperties: false
-      description: "A light simple light status.\r\nUsed to devices that can change\
-        \ also light color (RGB)."
+      description: |-
+        A light simple light status.
+        Used to devices that can change also light color (RGB).
       example:
         red: 180
         brightness: 56
         green: 237
         blue: 92
         temperature: 23
+        status: null
+    TemperatureSensor:
+      required:
+      - status
+      - temperature
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SwitchOptions'
+        temperature:
+          type: number
+          description: Temperature in celsius (X°)
+          format: double
+      additionalProperties: false
+      example:
+        temperature: 2.027123023002321833274663731572218239307403564453125
         status: null
     MinionStatus:
       type: object
@@ -2294,6 +2417,8 @@ components:
           $ref: '#/components/schemas/TemperatureLight'
         colorLight:
           $ref: '#/components/schemas/ColorLight'
+        temperatureSensor:
+          $ref: '#/components/schemas/TemperatureSensor'
       additionalProperties: false
       description: "Minion status, the available values depend on the minion type."
       example:
@@ -2301,6 +2426,9 @@ components:
           mode: hot
           temperature: 17
           fanStrength: null
+          status: null
+        temperatureSensor:
+          temperature: 2.027123023002321833274663731572218239307403564453125
           status: null
         light:
           brightness: 60
@@ -2327,6 +2455,341 @@ components:
           status: null
         switch:
           status: null
+    ActionSet:
+      required:
+      - minionId
+      - setStatus
+      type: object
+      properties:
+        minionId:
+          type: string
+          description: The minion to set
+        setStatus:
+          $ref: '#/components/schemas/MinionStatus'
+      additionalProperties: false
+      description: The action set to do on an action trigger
+      example:
+        minionId: minionId
+        setStatus: null
+    ActionApply:
+      type: string
+      description: |-
+        The triggers types.
+        - 'statusChange' to invoke only on status change, but allow change later the status
+        - 'permanent' at while the status of the minion of action trigger still on the triggered status, force the action, always.
+      enum:
+      - statusChange
+      - permanent
+    Action:
+      required:
+      - actionId
+      - active
+      - apply
+      - ifStatus
+      - minionId
+      - thenSet
+      type: object
+      properties:
+        actionId:
+          type: string
+          description: The action id
+        minionId:
+          type: string
+          description: The minion where his status will trigger this action set
+        active:
+          type: boolean
+          description: Whenever the action is active
+        name:
+          type: string
+          description: "Free text, as the action name"
+        ifStatus:
+          $ref: '#/components/schemas/MinionStatus'
+        thenSet:
+          type: array
+          description: The actions set to invoke in case of this action trigger
+          items:
+            $ref: '#/components/schemas/ActionSet'
+        apply:
+          $ref: '#/components/schemas/ActionApply'
+      additionalProperties: false
+      description: An action to trigger some minion/s status in case minion has some
+        status
+      example:
+        apply: statusChange
+        ifStatus:
+          airConditioning:
+            mode: hot
+            temperature: 17
+            fanStrength: null
+            status: null
+          temperatureSensor:
+            temperature: 2.027123023002321833274663731572218239307403564453125
+            status: null
+          light:
+            brightness: 60
+            status: null
+          cleaner:
+            mode: dock
+            fanSpeed: low
+            status: null
+          toggle:
+            status: "on"
+          temperatureLight:
+            brightness: 15
+            temperature: 60
+            status: null
+          roller:
+            status: null
+            direction: up
+          colorLight:
+            red: 180
+            brightness: 56
+            green: 237
+            blue: 92
+            temperature: 23
+            status: null
+          switch:
+            status: null
+        name: name
+        thenSet:
+        - minionId: minionId
+          setStatus: null
+        - minionId: minionId
+          setStatus: null
+        actionId: actionId
+        active: true
+        minionId: minionId
+    ErrorResponse:
+      required:
+      - responseCode
+      type: object
+      properties:
+        responseCode:
+          type: number
+          description: error code in system.
+          format: double
+        message:
+          type: string
+          description: Readable message.
+      additionalProperties: false
+      description: Error response.
+      example:
+        message: message
+        responseCode: 7.061401241503109105224211816675961017608642578125
+    Login:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        localServerId:
+          type: string
+          description: Optional for remote request forwards only
+      additionalProperties: false
+      description: Login schema model.
+    LoginMfa:
+      required:
+      - email
+      - mfa
+      type: object
+      properties:
+        email:
+          type: string
+        mfa:
+          type: string
+        localServerId:
+          type: string
+          description: Optional for remote request forwards only
+      additionalProperties: false
+    CollectionItem:
+      required:
+      - itemId
+      type: object
+      properties:
+        itemId:
+          type: string
+          description: "The item id, can be minion, timing, device etc"
+      additionalProperties: false
+      example:
+        itemId: itemId
+    Collection:
+      required:
+      - collectionId
+      - collectionName
+      - items
+      type: object
+      properties:
+        collectionId:
+          type: string
+          description: The action id
+        collectionName:
+          type: string
+          description: The trigger to apply the action
+        items:
+          type: array
+          description: The collection items
+          items:
+            $ref: '#/components/schemas/CollectionItem'
+      additionalProperties: false
+      description: "An collection of items, can be used for view aggregation of any\
+        \ item/s in the system"
+      example:
+        collectionId: collectionId
+        items:
+        - itemId: itemId
+        - itemId: itemId
+        collectionName: collectionName
+    DeviceStatus:
+      type: object
+      properties:
+        battery:
+          type: number
+          description: "The battery power, if relevant, in %."
+          format: double
+      additionalProperties: false
+      example:
+        battery: 0.80082819046101150206595775671303272247314453125
+    LocalNetworkDevice:
+      required:
+      - mac
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name.
+        mac:
+          type: string
+          description: "The MAC address of the device, the value is unique to each\
+            \ device."
+        vendor:
+          type: string
+          description: Info about device manufacturer.
+        ip:
+          type: string
+          description: "The device IP address, if exist it should be unique in network."
+        deviceStatus:
+          $ref: '#/components/schemas/DeviceStatus'
+      additionalProperties: false
+      description: Represents any physical device in a local network.
+      example:
+        vendor: vendor
+        ip: ip
+        name: name
+        mac: mac
+        deviceStatus:
+          battery: 0.80082819046101150206595775671303272247314453125
+    MinionTypes:
+      type: string
+      description: Supported minions types.
+      enum:
+      - toggle
+      - switch
+      - temperatureSensor
+      - roller
+      - cleaner
+      - airConditioning
+      - light
+      - temperatureLight
+      - colorLight
+    DeviceKind:
+      required:
+      - brand
+      - isFetchCommandsAvailable
+      - isIdRequired
+      - isRecordingSupported
+      - isTokenRequired
+      - minionsPerDevice
+      - model
+      - supportedMinionType
+      type: object
+      properties:
+        brand:
+          type: string
+          description: The brand of the current minion type. (see device model).
+        model:
+          type: string
+          description: The specific model of minion type. (see device model).
+        minionsPerDevice:
+          type: number
+          description: |-
+            The max minions that can be in one device, or -1 if unlimited.
+            For example, a simple smart socket can be 1 minion per device,
+            Wall switch with 3 switches can be 3 minions per device,
+            And IR transmitter can be unlimited minions per device.
+          format: double
+        isTokenRequired:
+          type: boolean
+          description: Is the device require a token for communication API.
+        isIdRequired:
+          type: boolean
+          description: Is device require id for communication API.
+        supportedMinionType:
+          $ref: '#/components/schemas/MinionTypes'
+        isRecordingSupported:
+          type: boolean
+          description: Some of the devices supported recording (for example IR transmitter).
+        isFetchCommandsAvailable:
+          type: boolean
+          description: "Whenever the device and module supported fetching commands\
+            \ data from \nthe https://github.com/casanet/rf-commands-repo project"
+      additionalProperties: false
+      description: "For each supported device, there are limitations and abilities\
+        \ of it."
+      example:
+        isFetchCommandsAvailable: true
+        isIdRequired: true
+        isTokenRequired: true
+        model: model
+        minionsPerDevice: 0.80082819046101150206595775671303272247314453125
+        supportedMinionType: toggle
+        brand: brand
+        isRecordingSupported: true
+    FeedEvent:
+      type: string
+      description: Feed update type enum.
+      enum:
+      - created
+      - update
+      - removed
+    MinionDevice:
+      required:
+      - brand
+      - model
+      - pysicalDevice
+      type: object
+      properties:
+        pysicalDevice:
+          $ref: '#/components/schemas/LocalNetworkDevice'
+        brand:
+          type: string
+          description: The brand of device.
+        model:
+          type: string
+          description: The specific model of the device.
+        token:
+          type: string
+          description: Some devices require a token for communication API.
+        deviceId:
+          type: string
+          description: Some devices require id for communication API.
+      additionalProperties: false
+      description: Represents a physical device kind with network info.
+      example:
+        pysicalDevice:
+          vendor: vendor
+          ip: ip
+          name: name
+          mac: mac
+          deviceStatus:
+            battery: 0.80082819046101150206595775671303272247314453125
+        model: model
+        brand: brand
+        deviceId: deviceId
+        token: token
     CalibrationMode:
       type: string
       enum:
@@ -2334,6 +2797,7 @@ components:
       - LOCK_OFF
       - SHABBAT
       - AUTO
+      - LOCK_DASHBOARD
     MinionCalibrate:
       required:
       - calibrationCycleMinutes
@@ -2377,25 +2841,30 @@ components:
           $ref: '#/components/schemas/MinionTypes'
         minionAutoTurnOffMS:
           type: number
-          description: "Auto turns  off duration, *if* set member value then the minion\
-            \ will turn off in X ms after turning it on,\r\nUsed for example in boiler\
-            \ minion etc."
+          description: |-
+            Auto turns  off duration, *if* set member value then the minion will turn off in X ms after turning it on,
+            Used for example in boiler minion etc.
           format: double
         calibration:
           $ref: '#/components/schemas/MinionCalibrate'
         room:
           type: string
           description: Represents the room where the minion is located at.
+        statusChangedTime:
+          type: number
+          description: Last status change timestamp in UTC MS
+          format: double
       additionalProperties: false
-      description: "Represents a minion in system.\r\nMinion is a logic device in\
-        \ the system, meaning that a device is a physical device and minion is a logic\
-        \ device\r\nthat uses a physical device to switch home kit status. For example,\
-        \ an IR transmitter can be one physical device\r\nfor a few minions, one to\
-        \ central AC control and second for secondary AC control\r\nso in it will\
-        \ be two totally different minions that use one physical device."
+      description: |-
+        Represents a minion in system.
+        Minion is a logic device in the system, meaning that a device is a physical device and minion is a logic device
+        that uses a physical device to switch home kit status. For example, an IR transmitter can be one physical device
+        for a few minions, one to central AC control and second for secondary AC control
+        so in it will be two totally different minions that use one physical device.
       example:
-        minionAutoTurnOffMS: 2.027123023002321833274663731572218239307403564453125
+        minionAutoTurnOffMS: 0.80082819046101150206595775671303272247314453125
         isProperlyCommunicated: true
+        statusChangedTime: 1.46581298050294517310021547018550336360931396484375
         minionType: toggle
         name: name
         minionStatus:
@@ -2403,6 +2872,9 @@ components:
             mode: hot
             temperature: 17
             fanStrength: null
+            status: null
+          temperatureSensor:
+            temperature: 2.027123023002321833274663731572218239307403564453125
             status: null
           light:
             brightness: 60
@@ -2435,6 +2907,8 @@ components:
             ip: ip
             name: name
             mac: mac
+            deviceStatus:
+              battery: 0.80082819046101150206595775671303272247314453125
           model: model
           brand: brand
           deviceId: deviceId
@@ -2444,23 +2918,88 @@ components:
           calibrationMode: LOCK_ON
         minionId: minionId
         room: room
+    MinionChangeTrigger:
+      type: string
+      description: The minion status change triggers
+      enum:
+      - user
+      - device
+      - timeout
+      - timing
+      - action
+      - lock
+      - sync
+      - rotation
+      - external
+    AuthScopes:
+      type: string
+      description: |-
+        Scopes of authentication, right know in our system there are only 3 scopes.
+        admin and user. any API route protect by one of them.
+      enum:
+      - adminAuth
+      - userAuth
+    User:
+      required:
+      - email
+      - ignoreTfa
+      - scope
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Name
+        email:
+          type: string
+          description: User email
+        password:
+          type: string
+          description: User password.
+        ignoreTfa:
+          type: boolean
+          description: Ignore 2-step verification on login or not.
+        scope:
+          $ref: '#/components/schemas/AuthScopes'
+        passwordChangeRequired:
+          type: boolean
+          description: "Whenever the user required to set new password, during default\
+            \ password usage, password expiration, etc."
+      additionalProperties: false
+      description: Represents a user in the system.
+      example:
+        password: password
+        passwordChangeRequired: true
+        displayName: displayName
+        scope: adminAuth
+        ignoreTfa: true
+        email: email
     MinionFeed:
       required:
       - event
       - minion
+      - oldMinion
       type: object
       properties:
         event:
           $ref: '#/components/schemas/FeedEvent'
         minion:
           $ref: '#/components/schemas/Minion'
+        oldMinion:
+          $ref: '#/components/schemas/Minion'
+        trigger:
+          $ref: '#/components/schemas/MinionChangeTrigger'
+        user:
+          $ref: '#/components/schemas/User'
       additionalProperties: false
       description: Minion feed object.
       example:
+        oldMinion: null
+        trigger: user
         event: created
         minion:
-          minionAutoTurnOffMS: 2.027123023002321833274663731572218239307403564453125
+          minionAutoTurnOffMS: 0.80082819046101150206595775671303272247314453125
           isProperlyCommunicated: true
+          statusChangedTime: 1.46581298050294517310021547018550336360931396484375
           minionType: toggle
           name: name
           minionStatus:
@@ -2468,6 +3007,9 @@ components:
               mode: hot
               temperature: 17
               fanStrength: null
+              status: null
+            temperatureSensor:
+              temperature: 2.027123023002321833274663731572218239307403564453125
               status: null
             light:
               brightness: 60
@@ -2500,6 +3042,8 @@ components:
               ip: ip
               name: name
               mac: mac
+              deviceStatus:
+                battery: 0.80082819046101150206595775671303272247314453125
             model: model
             brand: brand
             deviceId: deviceId
@@ -2509,6 +3053,13 @@ components:
             calibrationMode: LOCK_ON
           minionId: minionId
           room: room
+        user:
+          password: password
+          passwordChangeRequired: true
+          displayName: displayName
+          scope: adminAuth
+          ignoreTfa: true
+          email: email
     OperationActivity:
       required:
       - minionId
@@ -2528,6 +3079,9 @@ components:
             mode: hot
             temperature: 17
             fanStrength: null
+            status: null
+          temperatureSensor:
+            temperature: 2.027123023002321833274663731572218239307403564453125
             status: null
           light:
             brightness: 60
@@ -2594,13 +3148,14 @@ components:
             $ref: '#/components/schemas/DaysOptions'
         durationMinutes:
           type: number
-          description: "Minutes from the sun trigger.\r\ncan be before or after the\
-            \ sun triggers.\r\nFor example, to invoke 40 minutes before sunset set\
-            \ -40 and to invoke 40 minutes after sunset set 40.\r\n\r\nNOTE! if the\
-            \ duration is more then minutes available in the day from the sun trigger\
-            \ time, the timing will not activate.\r\nfor example if the sunset is\
-            \ in 18:00 and the duration set to 7*60 minutes,\r\nthe activate time\
-            \ is not on the same day, so it will not activate at all."
+          description: |-
+            Minutes from the sun trigger.
+            can be before or after the sun triggers.
+            For example, to invoke 40 minutes before sunset set -40 and to invoke 40 minutes after sunset set 40.
+
+            NOTE! if the duration is more then minutes available in the day from the sun trigger time, the timing will not activate.
+            for example if the sunset is in 18:00 and the duration set to 7*60 minutes,
+            the activate time is not on the same day, so it will not activate at all.
           format: double
         sunTrigger:
           $ref: '#/components/schemas/SunTriggerOptions'
@@ -2734,12 +3289,8 @@ components:
           $ref: '#/components/schemas/TimingTypes'
         timingProperties:
           $ref: '#/components/schemas/TimingProperties'
-        lockStatus:
-          type: boolean
-          description: Lock the status that changed by the timing (default false)
-        shabbatMode:
-          type: boolean
-          description: Set minion lock to be Shabbat mode
+        setLock:
+          $ref: '#/components/schemas/CalibrationMode'
         overrideLock:
           type: boolean
           description: "Override lock, if exists (default false)"
@@ -2764,13 +3315,16 @@ components:
             - sunday
             - sunday
             sunTrigger: sunrise
-        shabbatMode: true
+        setLock: LOCK_ON
         triggerDirectAction:
           minionStatus:
             airConditioning:
               mode: hot
               temperature: 17
               fanStrength: null
+              status: null
+            temperatureSensor:
+              temperature: 2.027123023002321833274663731572218239307403564453125
               status: null
             light:
               brightness: 60
@@ -2799,7 +3353,6 @@ components:
               status: null
           minionId: minionId
         triggerOperationId: triggerOperationId
-        lockStatus: true
         timingId: timingId
         overrideLock: true
         timingName: timingName
@@ -2856,13 +3409,16 @@ components:
               - sunday
               - sunday
               sunTrigger: sunrise
-          shabbatMode: true
+          setLock: LOCK_ON
           triggerDirectAction:
             minionStatus:
               airConditioning:
                 mode: hot
                 temperature: 17
                 fanStrength: null
+                status: null
+              temperatureSensor:
+                temperature: 2.027123023002321833274663731572218239307403564453125
                 status: null
               light:
                 brightness: 60
@@ -2891,7 +3447,6 @@ components:
                 status: null
             minionId: minionId
           triggerOperationId: triggerOperationId
-          lockStatus: true
           timingId: timingId
           overrideLock: true
           timingName: timingName
@@ -2906,72 +3461,12 @@ components:
             message: message
             responseCode: 7.061401241503109105224211816675961017608642578125
           minionId: minionId
-    IftttIntegrationSettings:
-      required:
-      - enableIntegration
-      type: object
-      properties:
-        apiKey:
-          type: string
-          description: WebHooks API key
-        enableIntegration:
-          type: boolean
-          description: Open or close ifttt integration.
-      additionalProperties: false
-      description: Ifttt integration settings
-    IftttRawActionTriggered:
-      required:
-      - apiKey
-      - minionId
-      - setStatus
-      type: object
-      properties:
-        apiKey:
-          type: string
-          description: WebHooks API key
-        localMac:
-          type: string
-          description: Allow remote-server to forward request to local server
-        minionId:
-          type: string
-        setStatus:
-          $ref: '#/components/schemas/SwitchOptions'
-      additionalProperties: false
-      description: Ifttt trigger with all request data in one JSON structure.
-    IftttActionTriggered:
-      required:
-      - apiKey
-      - setStatus
-      type: object
-      properties:
-        apiKey:
-          type: string
-          description: WebHooks API key
-        localMac:
-          type: string
-          description: Allow remote-server to forward request to local server
-        setStatus:
-          $ref: '#/components/schemas/SwitchOptions'
-      additionalProperties: false
-      description: Ifttt trigger set status action
-    IftttActionTriggeredRequest:
-      required:
-      - apiKey
-      type: object
-      properties:
-        apiKey:
-          type: string
-          description: WebHooks API key
-        localMac:
-          type: string
-          description: Allow remote-server to forward request to local server
-      additionalProperties: false
-      description: Ifttt trigger action auth and forward fields
     MinionTimeline:
       required:
       - minionId
       - status
       - timestamp
+      - trigger
       type: object
       properties:
         minionId:
@@ -2981,9 +3476,17 @@ components:
           format: double
         status:
           $ref: '#/components/schemas/MinionStatus'
+        trigger:
+          $ref: '#/components/schemas/MinionChangeTrigger'
+        user:
+          $ref: '#/components/schemas/MinionTimeline_user'
       additionalProperties: false
       description: Minion timeline node
       example:
+        trigger: user
+        user:
+          name: name
+          email: email
         minionId: minionId
         timestamp: 0.80082819046101150206595775671303272247314453125
         status:
@@ -2991,6 +3494,9 @@ components:
             mode: hot
             temperature: 17
             fanStrength: null
+            status: null
+          temperatureSensor:
+            temperature: 2.027123023002321833274663731572218239307403564453125
             status: null
           light:
             brightness: 60
@@ -3037,6 +3543,16 @@ components:
           description: The new room name to set.
       additionalProperties: false
       description: Used to set minion room name.
+    MinionSetDevice:
+      required:
+      - mac
+      type: object
+      properties:
+        mac:
+          type: string
+          description: The device mac to set.
+      additionalProperties: false
+      description: Used to set minion physical device.
     SetMinionAutoTurnOff:
       required:
       - setAutoTurnOffMS
@@ -3066,24 +3582,6 @@ components:
       description: Scanning progress status
       example:
         scanningStatus: inProgress
-    IftttOnChanged:
-      required:
-      - deviceId
-      - newStatus
-      type: object
-      properties:
-        localMac:
-          type: string
-          description: Allow remote-server to forward request to local server
-        deviceId:
-          type: string
-          description: "Device id (AKA Ifttt webhook API key), this is the authentication\
-            \ of request."
-        newStatus:
-          $ref: '#/components/schemas/SwitchOptions'
-      additionalProperties: false
-      description: "Ifttt webhook request body to notify minion status changed.\r\n\
-        *Used in ifttt module interface only*"
     Operation:
       required:
       - activities
@@ -3103,10 +3601,11 @@ components:
           items:
             $ref: '#/components/schemas/OperationActivity'
       additionalProperties: false
-      description: "Represents an operation in the system.\r\nAn operation is a set\
-        \ of activities to do.\r\nFor example, to turn on all home light operation\r\
-        \nsets an array of activity for each light in the home to set light status\
-        \ 'on'."
+      description: |-
+        Represents an operation in the system.
+        An operation is a set of activities to do.
+        For example, to turn on all home light operation
+        sets an array of activity for each light in the home to set light status 'on'.
       example:
         activities:
         - minionStatus:
@@ -3114,6 +3613,9 @@ components:
               mode: hot
               temperature: 17
               fanStrength: null
+              status: null
+            temperatureSensor:
+              temperature: 2.027123023002321833274663731572218239307403564453125
               status: null
             light:
               brightness: 60
@@ -3146,6 +3648,9 @@ components:
               mode: hot
               temperature: 17
               fanStrength: null
+              status: null
+            temperatureSensor:
+              temperature: 2.027123023002321833274663731572218239307403564453125
               status: null
             light:
               brightness: 60
@@ -3218,49 +3723,6 @@ components:
           description: Access key for authorization local server in the remote server
       additionalProperties: false
       description: Remote server settings.
-    AuthScopes:
-      type: string
-      description: "Scopes of authentication, right know in our system there are only\
-        \ 3 scopes.\r\nadmin and user. any API route protect by one of them."
-      enum:
-      - adminAuth
-      - userAuth
-      - iftttAuth
-    User:
-      required:
-      - email
-      - ignoreTfa
-      - scope
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Name
-        email:
-          type: string
-          description: User email
-        password:
-          minLength: 8
-          type: string
-          description: User password.
-        ignoreTfa:
-          type: boolean
-          description: Ignore 2-step verification on login or not.
-        scope:
-          $ref: '#/components/schemas/AuthScopes'
-        passwordChangeRequired:
-          type: boolean
-          description: "Whenever the user required to set new password, during default\
-            \ password usage, password expiration, etc."
-      additionalProperties: false
-      description: Represents a user in the system.
-      example:
-        password: password
-        passwordChangeRequired: true
-        displayName: displayName
-        scope: adminAuth
-        ignoreTfa: true
-        email: email
     UserForwardAuth:
       required:
       - code
@@ -3318,6 +3780,19 @@ components:
         version: version
         commitHash: commitHash
         timestamp: 0.80082819046101150206595775671303272247314453125
+    MinionTimeline_user:
+      required:
+      - email
+      - name
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+      example:
+        name: name
+        email: email
   responses: {}
   parameters: {}
   examples: {}
@@ -3331,8 +3806,4 @@ components:
     adminAuth:
       type: apiKey
       name: authentication
-      in: header
-    iftttAuth:
-      type: apiKey
-      name: apiKey
       in: header

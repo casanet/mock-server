@@ -1,7 +1,7 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.getCurrentVersion = function getCurrentVersion (req, res, next) {
 	utils.writeJson(res, dataStore.currentVersion);

@@ -1,7 +1,7 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.createUser = function createUser (req, res, next, body) {
   const data = dataStore.getSessionData(req.session);

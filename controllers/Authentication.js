@@ -2,7 +2,7 @@
 
 var randomstring = require("randomstring");
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.login = function login (req, res, next, body) {
 	// Once user login, generate new session, and create new set of mock data for him

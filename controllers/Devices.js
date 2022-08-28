@@ -1,7 +1,7 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.getDevices = function getDevices (req, res, next) {
 	utils.writeJson(res, dataStore.getSessionData(req.session).devices);

@@ -2,7 +2,7 @@
 
 var utils = require('../utils/writer.js');
 var randomstring = require("randomstring");
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.getConnectionStatus = function getConnectionStatus (req, res, next) {
 	utils.writeJson(res, dataStore.connectionStatus);

@@ -1,7 +1,7 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.fetchDeviceCommandsToMinion = function fetchDeviceCommandsToMinion (req, res, next, body, minionId) {
   utils.writeJson(res);

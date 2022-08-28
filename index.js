@@ -6,7 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const express = require("express");
 const oas3Tools = require('@haimkastner/oas3-tools');
-const dataStore = require('./utils/dataStore');
+const dataStore = require('./data/dataStore');
 
 dotenv.config();
 

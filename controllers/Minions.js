@@ -2,7 +2,7 @@
 
 var randomstring = require("randomstring");
 var utils = require('../utils/writer.js');
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.createMinion = function createMinion(req, res, next, body) {
 	const data = dataStore.getSessionData(req.session);

@@ -2,7 +2,7 @@
 
 var utils = require('../utils/writer.js');
 var randomstring = require("randomstring");
-var dataStore = require('../utils/dataStore');
+var dataStore = require('../data/dataStore');
 
 module.exports.createTiming = function createTiming(req, res, next, body) {
 	const data = dataStore.getSessionData(req.session);
