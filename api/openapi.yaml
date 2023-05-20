@@ -8,9 +8,9 @@ info:
     email: haim.kastner@gmail.com
   license:
     name: ISC
-  version: 4.0.17
+  version: 4.0.38
 servers:
-- url: https://casanet-mock-server.herokuapp.com/API
+- url: https://demo.remote.casanet.casa/API
 paths:
   /actions:
     get:
@@ -759,6 +759,95 @@ paths:
       - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Minions
+  /minions/timeout:
+    get:
+      tags:
+      - Minions
+      description: Update minion auto turns off timeout.
+      operationId: GetMinionsTimeout
+      parameters: []
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MinionTimeout'
+                x-content-type: application/json
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/timeout/restart/{minionId}:
+    post:
+      tags:
+      - Minions
+      description: URestart minion timeout countdown.
+      operationId: RestartMinionTimeout
+      parameters:
+      - name: minionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/timeout/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Update minion auto turns off timeout.
+      operationId: SetMinionTimeout
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Timeout property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetMinionAutoTurnOff'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
   /minions/power-off:
     put:
       tags:
@@ -776,7 +865,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Minions
   /minions/rename/{minionId}:
@@ -795,6 +883,7 @@ paths:
         schema:
           type: string
       requestBody:
+        description: The new name to set.
         content:
           application/json:
             schema:
@@ -869,41 +958,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MinionSetDevice'
-        required: true
-      responses:
-        "204":
-          description: No content
-        "501":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      security:
-      - userAuth: []
-      - adminAuth: []
-      x-swagger-router-controller: Minions
-  /minions/timeout/{minionId}:
-    put:
-      tags:
-      - Minions
-      description: Update minion auto turns off timeout.
-      operationId: SetMinionTimeout
-      parameters:
-      - name: minionId
-        in: path
-        description: Minion id.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      requestBody:
-        description: Timeout property.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetMinionAutoTurnOff'
         required: true
       responses:
         "204":
@@ -1032,6 +1086,42 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - userAuth: []
+      - adminAuth: []
+      x-swagger-router-controller: Minions
+  /minions/restrictions/{minionId}:
+    put:
+      tags:
+      - Minions
+      description: Set minion access restrictions
+      operationId: SetMinionRestriction
+      parameters:
+      - name: minionId
+        in: path
+        description: Minion id.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The collection of restriction to set.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RestrictionItem'
+        required: true
+      responses:
+        "204":
+          description: No content
+        "501":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
       - adminAuth: []
       x-swagger-router-controller: Minions
   /minions/{minionId}:
@@ -1198,7 +1288,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
     post:
@@ -1225,7 +1314,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
   /operations/{operationId}:
@@ -1257,7 +1345,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
     put:
@@ -1292,7 +1379,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
     delete:
@@ -1320,7 +1406,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
   /operations/trigger/{operationId}:
@@ -1356,7 +1441,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       deprecated: true
       security:
-      - userAuth: []
       - adminAuth: []
       x-swagger-router-controller: Operations
   /rf/devices:
@@ -2396,7 +2480,7 @@ components:
           format: double
       additionalProperties: false
       example:
-        temperature: 2.027123023002321833274663731572218239307403564453125
+        temperature: 2.027123023002322
         status: null
     MinionStatus:
       type: object
@@ -2428,7 +2512,7 @@ components:
           fanStrength: null
           status: null
         temperatureSensor:
-          temperature: 2.027123023002321833274663731572218239307403564453125
+          temperature: 2.027123023002322
           status: null
         light:
           brightness: 60
@@ -2523,7 +2607,7 @@ components:
             fanStrength: null
             status: null
           temperatureSensor:
-            temperature: 2.027123023002321833274663731572218239307403564453125
+            temperature: 2.027123023002322
             status: null
           light:
             brightness: 60
@@ -2575,7 +2659,7 @@ components:
       description: Error response.
       example:
         message: message
-        responseCode: 7.061401241503109105224211816675961017608642578125
+        responseCode: 7.061401241503109
     Login:
       required:
       - email
@@ -2650,9 +2734,13 @@ components:
           type: number
           description: "The battery power, if relevant, in %."
           format: double
+        charging:
+          type: boolean
+          description: Is the device in charging mode
       additionalProperties: false
       example:
-        battery: 0.80082819046101150206595775671303272247314453125
+        charging: true
+        battery: 0.8008281904610115
     LocalNetworkDevice:
       required:
       - mac
@@ -2681,7 +2769,8 @@ components:
         name: name
         mac: mac
         deviceStatus:
-          battery: 0.80082819046101150206595775671303272247314453125
+          charging: true
+          battery: 0.8008281904610115
     MinionTypes:
       type: string
       description: Supported minions types.
@@ -2744,7 +2833,7 @@ components:
         isIdRequired: true
         isTokenRequired: true
         model: model
-        minionsPerDevice: 0.80082819046101150206595775671303272247314453125
+        minionsPerDevice: 0.8008281904610115
         supportedMinionType: toggle
         brand: brand
         isRecordingSupported: true
@@ -2785,7 +2874,8 @@ components:
           name: name
           mac: mac
           deviceStatus:
-            battery: 0.80082819046101150206595775671303272247314453125
+            charging: true
+            battery: 0.8008281904610115
         model: model
         brand: brand
         deviceId: deviceId
@@ -2816,6 +2906,28 @@ components:
       example:
         calibrationCycleMinutes: 0
         calibrationMode: LOCK_ON
+    RestrictionType:
+      type: string
+      description: Type of resection of access
+      enum:
+      - BLOCK
+      - READ
+      - WRITE
+    RestrictionItem:
+      required:
+      - restrictionType
+      - userEmail
+      type: object
+      properties:
+        userEmail:
+          type: string
+          description: The use to restrict
+        restrictionType:
+          $ref: '#/components/schemas/RestrictionType'
+      additionalProperties: false
+      example:
+        restrictionType: BLOCK
+        userEmail: userEmail
     Minion:
       required:
       - device
@@ -2854,6 +2966,11 @@ components:
           type: number
           description: Last status change timestamp in UTC MS
           format: double
+        restrictions:
+          type: array
+          description: The restriction of access on this minion
+          items:
+            $ref: '#/components/schemas/RestrictionItem'
       additionalProperties: false
       description: |-
         Represents a minion in system.
@@ -2862,11 +2979,16 @@ components:
         for a few minions, one to central AC control and second for secondary AC control
         so in it will be two totally different minions that use one physical device.
       example:
-        minionAutoTurnOffMS: 0.80082819046101150206595775671303272247314453125
+        minionAutoTurnOffMS: 0.8008281904610115
         isProperlyCommunicated: true
-        statusChangedTime: 1.46581298050294517310021547018550336360931396484375
+        statusChangedTime: 1.4658129805029452
         minionType: toggle
         name: name
+        restrictions:
+        - restrictionType: BLOCK
+          userEmail: userEmail
+        - restrictionType: BLOCK
+          userEmail: userEmail
         minionStatus:
           airConditioning:
             mode: hot
@@ -2874,7 +2996,7 @@ components:
             fanStrength: null
             status: null
           temperatureSensor:
-            temperature: 2.027123023002321833274663731572218239307403564453125
+            temperature: 2.027123023002322
             status: null
           light:
             brightness: 60
@@ -2908,7 +3030,8 @@ components:
             name: name
             mac: mac
             deviceStatus:
-              battery: 0.80082819046101150206595775671303272247314453125
+              charging: true
+              battery: 0.8008281904610115
           model: model
           brand: brand
           deviceId: deviceId
@@ -2997,11 +3120,16 @@ components:
         trigger: user
         event: created
         minion:
-          minionAutoTurnOffMS: 0.80082819046101150206595775671303272247314453125
+          minionAutoTurnOffMS: 0.8008281904610115
           isProperlyCommunicated: true
-          statusChangedTime: 1.46581298050294517310021547018550336360931396484375
+          statusChangedTime: 1.4658129805029452
           minionType: toggle
           name: name
+          restrictions:
+          - restrictionType: BLOCK
+            userEmail: userEmail
+          - restrictionType: BLOCK
+            userEmail: userEmail
           minionStatus:
             airConditioning:
               mode: hot
@@ -3009,7 +3137,7 @@ components:
               fanStrength: null
               status: null
             temperatureSensor:
-              temperature: 2.027123023002321833274663731572218239307403564453125
+              temperature: 2.027123023002322
               status: null
             light:
               brightness: 60
@@ -3043,7 +3171,8 @@ components:
               name: name
               mac: mac
               deviceStatus:
-                battery: 0.80082819046101150206595775671303272247314453125
+                charging: true
+                battery: 0.8008281904610115
             model: model
             brand: brand
             deviceId: deviceId
@@ -3081,7 +3210,7 @@ components:
             fanStrength: null
             status: null
           temperatureSensor:
-            temperature: 2.027123023002321833274663731572218239307403564453125
+            temperature: 2.027123023002322
             status: null
           light:
             brightness: 60
@@ -3162,7 +3291,7 @@ components:
       additionalProperties: false
       description: Daily timing based on sun triggers.
       example:
-        durationMinutes: 0.80082819046101150206595775671303272247314453125
+        durationMinutes: 0.8008281904610115
         days:
         - sunday
         - sunday
@@ -3211,7 +3340,7 @@ components:
       additionalProperties: false
       description: Once timing structure.
       example:
-        date: 5.962133916683182377482808078639209270477294921875
+        date: 5.962133916683182
     TimeoutTiming:
       required:
       - durationInMinutes
@@ -3230,8 +3359,8 @@ components:
       additionalProperties: false
       description: Timeout timing structure.
       example:
-        durationInMinutes: 2.3021358869347654518833223846741020679473876953125
-        startDate: 5.63737665663332876420099637471139430999755859375
+        durationInMinutes: 2.3021358869347655
+        startDate: 5.637376656633329
     TimingProperties:
       type: object
       properties:
@@ -3253,12 +3382,12 @@ components:
           - null
           - null
         once:
-          date: 5.962133916683182377482808078639209270477294921875
+          date: 5.962133916683182
         timeout:
-          durationInMinutes: 2.3021358869347654518833223846741020679473876953125
-          startDate: 5.63737665663332876420099637471139430999755859375
+          durationInMinutes: 2.3021358869347655
+          startDate: 5.637376656633329
         dailySunTrigger:
-          durationMinutes: 0.80082819046101150206595775671303272247314453125
+          durationMinutes: 0.8008281904610115
           days:
           - sunday
           - sunday
@@ -3305,12 +3434,12 @@ components:
             - null
             - null
           once:
-            date: 5.962133916683182377482808078639209270477294921875
+            date: 5.962133916683182
           timeout:
-            durationInMinutes: 2.3021358869347654518833223846741020679473876953125
-            startDate: 5.63737665663332876420099637471139430999755859375
+            durationInMinutes: 2.3021358869347655
+            startDate: 5.637376656633329
           dailySunTrigger:
-            durationMinutes: 0.80082819046101150206595775671303272247314453125
+            durationMinutes: 0.8008281904610115
             days:
             - sunday
             - sunday
@@ -3324,7 +3453,7 @@ components:
               fanStrength: null
               status: null
             temperatureSensor:
-              temperature: 2.027123023002321833274663731572218239307403564453125
+              temperature: 2.027123023002322
               status: null
             light:
               brightness: 60
@@ -3373,7 +3502,7 @@ components:
       example:
         error:
           message: message
-          responseCode: 7.061401241503109105224211816675961017608642578125
+          responseCode: 7.061401241503109
         minionId: minionId
     TimingFeed:
       required:
@@ -3399,12 +3528,12 @@ components:
               - null
               - null
             once:
-              date: 5.962133916683182377482808078639209270477294921875
+              date: 5.962133916683182
             timeout:
-              durationInMinutes: 2.3021358869347654518833223846741020679473876953125
-              startDate: 5.63737665663332876420099637471139430999755859375
+              durationInMinutes: 2.3021358869347655
+              startDate: 5.637376656633329
             dailySunTrigger:
-              durationMinutes: 0.80082819046101150206595775671303272247314453125
+              durationMinutes: 0.8008281904610115
               days:
               - sunday
               - sunday
@@ -3418,7 +3547,7 @@ components:
                 fanStrength: null
                 status: null
               temperatureSensor:
-                temperature: 2.027123023002321833274663731572218239307403564453125
+                temperature: 2.027123023002322
                 status: null
               light:
                 brightness: 60
@@ -3455,11 +3584,11 @@ components:
         results:
         - error:
             message: message
-            responseCode: 7.061401241503109105224211816675961017608642578125
+            responseCode: 7.061401241503109
           minionId: minionId
         - error:
             message: message
-            responseCode: 7.061401241503109105224211816675961017608642578125
+            responseCode: 7.061401241503109
           minionId: minionId
     MinionTimeline:
       required:
@@ -3488,7 +3617,7 @@ components:
           name: name
           email: email
         minionId: minionId
-        timestamp: 0.80082819046101150206595775671303272247314453125
+        timestamp: 0.8008281904610115
         status:
           airConditioning:
             mode: hot
@@ -3496,7 +3625,7 @@ components:
             fanStrength: null
             status: null
           temperatureSensor:
-            temperature: 2.027123023002321833274663731572218239307403564453125
+            temperature: 2.027123023002322
             status: null
           light:
             brightness: 60
@@ -3523,6 +3652,39 @@ components:
             status: null
           switch:
             status: null
+    MinionTimeout:
+      required:
+      - active
+      - countdownTimestamp
+      - minionId
+      type: object
+      properties:
+        minionId:
+          type: string
+        active:
+          type: boolean
+          description: IS countdown active
+        countdownTimestamp:
+          type: number
+          description: EPOCH time when countdown started
+          format: double
+      additionalProperties: false
+      description: Minion timeout countdown information
+      example:
+        countdownTimestamp: 0.8008281904610115
+        active: true
+        minionId: minionId
+    SetMinionAutoTurnOff:
+      required:
+      - setAutoTurnOffMS
+      type: object
+      properties:
+        setAutoTurnOffMS:
+          type: number
+          description: "The timeout duration in ms, to turn off set 0 as valse."
+          format: double
+      additionalProperties: false
+      description: Used to change the minion auto turn off the timeout value.
     MinionRename:
       required:
       - name
@@ -3553,17 +3715,6 @@ components:
           description: The device mac to set.
       additionalProperties: false
       description: Used to set minion physical device.
-    SetMinionAutoTurnOff:
-      required:
-      - setAutoTurnOffMS
-      type: object
-      properties:
-        setAutoTurnOffMS:
-          type: number
-          description: "The timeout duration in ms, to turn off set 0 as valse."
-          format: double
-      additionalProperties: false
-      description: Used to change the minion auto turn off the timeout value.
     ProgressStatus:
       type: string
       description: Long-time job status
@@ -3615,7 +3766,7 @@ components:
               fanStrength: null
               status: null
             temperatureSensor:
-              temperature: 2.027123023002321833274663731572218239307403564453125
+              temperature: 2.027123023002322
               status: null
             light:
               brightness: 60
@@ -3650,7 +3801,7 @@ components:
               fanStrength: null
               status: null
             temperatureSensor:
-              temperature: 2.027123023002321833274663731572218239307403564453125
+              temperature: 2.027123023002322
               status: null
             light:
               brightness: 60
@@ -3721,6 +3872,9 @@ components:
         connectionKey:
           type: string
           description: Access key for authorization local server in the remote server
+        blockLogsFetchByRemote:
+          type: boolean
+          description: Prevent remote server from feting logs
       additionalProperties: false
       description: Remote server settings.
     UserForwardAuth:
@@ -3779,7 +3933,7 @@ components:
       example:
         version: version
         commitHash: commitHash
-        timestamp: 0.80082819046101150206595775671303272247314453125
+        timestamp: 0.8008281904610115
     MinionTimeline_user:
       required:
       - email

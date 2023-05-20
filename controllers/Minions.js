@@ -107,3 +107,11 @@ module.exports.setMinionTimeout = function setMinionTimeout(req, res, next, body
 	dataStore.setSessionData(req.session, data);
 	utils.writeJson(res);
 };
+
+module.exports.getMinionsTimeout = function getMinionsTimeout(req, res, next) {
+	utils.writeJson([]);
+};
+
+module.exports.getMinionsTimeout = function getMinionsTimeout(req, res, next) {
+	utils.writeJson([]);
+};

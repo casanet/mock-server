@@ -10,7 +10,7 @@ const dataStore = require('./data/dataStore');
 
 dotenv.config();
 
-const serverPort = process.env.PORT || 8080;
+const serverPort = +process.env.PORT || 8080;
 const localDevMode = !!process.env.DEV_MODE;
 
 console.info(
