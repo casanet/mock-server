@@ -109,9 +109,13 @@ module.exports.setMinionTimeout = function setMinionTimeout(req, res, next, body
 };
 
 module.exports.getMinionsTimeout = function getMinionsTimeout(req, res, next) {
-	utils.writeJson([]);
+	const data = dataStore.getSessionData(req.session);
+	utils.writeJson(res, data.timeout);
 };
 
-module.exports.getMinionsTimeout = function getMinionsTimeout(req, res, next) {
-	utils.writeJson([]);
+module.exports.restartMinionTimeout = function restartMinionTimeout(req, res, next, minionId) {
+	const data = dataStore.getSessionData(req.session);
+	data.timeout[0].countdownTimestamp = new Date().getTime();
+	dataStore.setSessionData(req.session, data);
+	utils.writeJson(res);
 };

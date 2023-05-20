@@ -13,6 +13,7 @@ const { profile } = require("./predefined/profile");
 const { commandsRepo } = require("./predefined/commandsRepo");
 const { defaultMinionStatus } = require("./predefined/minionStatus");
 const { genTimeline } = require("./predefined/timeline");
+const { getTimeout } = require("./predefined/timeout");
 
 
 // Store all data map to the session, with TTL to release memory.
@@ -51,6 +52,7 @@ exports.addSessionData = function (session, email) {
 		actions,
 		devices,
 		devicesKinds,
+		timeout : getTimeout(),
 		timeline: genTimeline(),
 		// Keep session user
 		sessionUser: email,
